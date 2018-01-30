@@ -1,6 +1,5 @@
 ---
-spec:
-  name: Unnamed player
+name: Unnamed player
 appearance:
   description: A nondescript player
 ...

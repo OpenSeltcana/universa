@@ -12,7 +12,13 @@ iex(1)> Universa.Channel.Server.add_system(Universa.System.Debug)
 {:ok, #PID<0.165.0>}
 iex(2)> Universa.Channel.Server.add_system(Universa.System.MOTD)
 {:ok, #PID<0.165.0>}
-iex(3)>
+iex(3)> xxxxxxxxxxxx Universa.System.Debug xxxxxxxxx
+iex(3)> {{:player_connect, #PID<0.195.0>}, "server:nonode@nohost"}
+iex(3)> xxxxxxxxxxxx   END OF INTERCEPT    xxxxxxxxx
+iex(3)> xxxxxxxxxxxx Universa.System.Debug xxxxxxxxx
+iex(3)> {{:player_input, "Hello?\r\n"}, "server:nonode@nohost"}
+iex(3)> xxxxxxxxxxxx   END OF INTERCEPT    xxxxxxxxx
+iex(3)> 
 ```
 
 ## Concepts

@@ -8,10 +8,14 @@ defmodule Universa.Channel do
 
   def send(channel, message) do
     tasks = Enum.map(members_systems(channel), fn {_pid, system} ->
-      Task.Supervisor.async_nolink(Universa.SystemSupervisor,
-                                   system,
-                                   :handle,
-                                   [message, channel])
+      try do
+        Task.Supervisor.async_nolink(Universa.SystemSupervisor,
+                                     system,
+                                     :handle,
+                                     [message, channel])
+      rescue
+        _ -> false
+      end
     end)
     Enum.any?(tasks, fn(task) ->
       Task.await(task)

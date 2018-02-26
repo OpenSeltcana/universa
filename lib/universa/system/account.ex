@@ -1,6 +1,8 @@
 defmodule Universa.System.Account do
   use Universa.System
 
+  auto_subscribe
+
   def handle({:player_connect, terminal}, _channel) do
     # Add the Account Component to the entity when they connect
     uuid = Universa.Component.get_entity_id(terminal)

@@ -37,4 +37,4 @@ iex(3)>
 
 For example, when someone connects to the server a `Universa.Component.Socket` is made to store the socket for later access and through `Universa.Channel.Server` a `:player_connect` event is sent.
 
-Now if `Universa.System.MOTD` is added to the `Universa.Channel.Server` (look at #Example Usage how to), it will process the event and send the welcoming message to the socket in the `Universa.Component.Socket` made earlier.
+Now if `Universa.System.Account` is added to the `Universa.Channel.Server` (look at #Example Usage how to), it will process the event and send the welcoming message to the socket in the `Universa.Component.Socket` made earlier.

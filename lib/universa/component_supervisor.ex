@@ -14,8 +14,13 @@ defmodule Universa.ComponentSupervisor do
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
-  def rem_component(uuid) do
-    DynamicSupervisor.terminate_child(__MODULE__, "entity:#{uuid}")
+  def add_component(type, entity_uuid) do
+    child_spec = {type, [entity_uuid]}
+    DynamicSupervisor.start_child(__MODULE__, child_spec)
+  end
+
+  def rem_component(pid) do
+    DynamicSupervisor.terminate_child(__MODULE__, pid)
   end
 
   def children do

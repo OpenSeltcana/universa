@@ -23,8 +23,8 @@ defmodule Universa.Server do
   end
 
   defp first_serve(socket) do
-    {:ok, component} = Universa.Component.Socket.new
-    Universa.Component.set_value(component, socket)
+    {:ok, component} = Universa.Component.Terminal.new
+    Universa.Component.set_value(component, {:socket, socket})
     Universa.Channel.Server.send({:player_connect, component})
 
     serve(socket, component)

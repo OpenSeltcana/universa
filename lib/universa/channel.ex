@@ -36,6 +36,13 @@ defmodule Universa.Channel do
     Registry.lookup(Universa.ChannelRegistry, "#{channel}_entities")
   end
 
+  def get_types(channel, types) do
+    members(channel)
+    |> Enum.filter(fn {pid, type} -> Enum.member?(types, type) end)
+    |> Enum.map(fn {pid, type} -> {type, pid} end)
+    |> Map.new
+  end
+
   def unsubscribe(channel) do
     Registry.unregister(Universa.ChannelRegistry, "#{channel}_entities")
   end
@@ -74,6 +81,10 @@ defmodule Universa.Channel do
 
       def members(which) do
         Universa.Channel.members(to_channel_identifier(which))
+      end
+
+      def get_types(which, types) do
+        Universa.Channel.get_types(to_channel_identifier(which), types)
       end
 
       def unsubscribe(which, module) do

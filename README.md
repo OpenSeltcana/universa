@@ -7,18 +7,26 @@ Right now no Systems are added by default, so to get the MOTD, run:
 $> iex -S mix
 Interactive Elixir (1.6.0) - press Ctrl+C to exit (type h() ENTER for help)
 
-23:59:12.140 [info]  Accepting connections on port 2323
+16:48:07.038 [info]  Accepting connections on port 2323
 iex(1)> Universa.Channel.Server.add_system(Universa.System.Debug)
-{:ok, #PID<0.165.0>}
-iex(2)> Universa.Channel.Server.add_system(Universa.System.MOTD)
-{:ok, #PID<0.165.0>}
+{:ok, #PID<0.162.0>}
+iex(2)> Universa.Channel.Server.add_system(Universa.System.Account)
+{:ok, #PID<0.162.0>}
 iex(3)> xxxxxxxxxxxx Universa.System.Debug xxxxxxxxx
-iex(3)> {{:player_connect, #PID<0.195.0>}, "server:nonode@nohost"}
+iex(3)> {{:player_connect, #PID<0.175.0>}, "server:nonode@nohost"}
 iex(3)> xxxxxxxxxxxx   END OF INTERCEPT    xxxxxxxxx
 iex(3)> xxxxxxxxxxxx Universa.System.Debug xxxxxxxxx
-iex(3)> {{:player_input, "Hello?\r\n"}, "server:nonode@nohost"}
+iex(3)> Username Mr. Test
+iex(3)> {{:player_input, #PID<0.175.0>, "Mr. Test\r\n"}, "server:nonode@nohost"}
 iex(3)> xxxxxxxxxxxx   END OF INTERCEPT    xxxxxxxxx
-iex(3)> 
+iex(3)> xxxxxxxxxxxx Universa.System.Debug xxxxxxxxx
+iex(3)> Password Never!
+iex(3)> {{:player_input, #PID<0.175.0>, "Never!\r\n"}, "server:nonode@nohost"}
+iex(3)> xxxxxxxxxxxx   END OF INTERCEPT    xxxxxxxxx
+iex(3)> xxxxxxxxxxxx Universa.System.Debug xxxxxxxxx
+iex(3)> {{:player_ready, #PID<0.175.0>}, "server:nonode@nohost"}
+iex(3)> xxxxxxxxxxxx   END OF INTERCEPT    xxxxxxxxx
+iex(3)>
 ```
 
 ## Concepts

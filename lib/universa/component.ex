@@ -16,11 +16,16 @@ defmodule Universa.Component do
 
       def new(), do: Universa.ComponentSupervisor.add_component(__MODULE__)
 
-      def start_link(_opts) do
-        uuid = UUID.uuid1()
-        GenServer.start_link(__MODULE__,
-                             struct(__MODULE__, %{entity_id: UUID.uuid1()}))
+      def new(uuid) do
+        Universa.ComponentSupervisor.add_component(__MODULE__, uuid)
       end
+
+      def start_link([uuid]) do
+        GenServer.start_link(__MODULE__,
+                             struct(__MODULE__, %{entity_id: uuid}))
+      end
+
+      def start_link([]), do: start_link([UUID.uuid1()])
 
       def init(state) do
         uuid = Map.get(state, :entity_id)
@@ -30,7 +35,7 @@ defmodule Universa.Component do
 
       # Server functions
 
-      def handle_call(:get_id, _from, state) do
+      def handle_call(:get_entity_id, _from, state) do
         reply =
           state
           |> Map.get(:entity_id)
@@ -67,8 +72,8 @@ defmodule Universa.Component do
 
   # Client functions
 
-  def get_id(pid) do
-    GenServer.call(pid, :get_id)
+  def get_entity_id(pid) do
+    GenServer.call(pid, :get_entity_id)
   end
 
   def get_type(pid) do
@@ -81,5 +86,9 @@ defmodule Universa.Component do
 
   def set_value(pid, value) do
     GenServer.cast(pid, {:set_value, value})
+  end
+
+  def remove(pid) do
+    Universa.ComponentSupervisor.rem_component(pid)
   end
 end

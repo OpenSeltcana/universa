@@ -1,12 +1,11 @@
 defmodule Universa.System do
-
   @callback handle(event :: any, channel :: any) :: boolean()
 
   defmacro __using__(_options) do
     quote location: :keep do
       @behaviour Universa.System
       @auto_subscribe false
-      
+
       import unquote(__MODULE__)
       @before_compile unquote(__MODULE__)
     end
@@ -17,6 +16,8 @@ defmodule Universa.System do
       def auto_subscribe do
         @auto_subscribe
       end
+
+      def handle(_,_), do: false
     end
   end
 

@@ -3,7 +3,8 @@ defmodule Universa.System.Account do
 
   auto_subscribe
 
-  def handle({:player_connect, terminal}, _channel) do
+  capability :player_connect
+  def handle({:player_connect, terminal}) do
     # Add the Account Component to the entity when they connect
     uuid = Universa.Component.get_entity_id(terminal)
     {:ok, account} = Universa.Component.LoggingIn.new(uuid)
@@ -21,11 +22,10 @@ defmodule Universa.System.Account do
     \r
         Enter your nickname, or the one you'd like if you are new here:\r
     """)
-
-    true
   end
 
-  def handle({:player_input, terminal, message}, _channel) do
+  capability :player_input, [Universa.Component.LoggingIn]
+  def handle({:player_input, terminal, message}) do
     {:socket, socket} = Universa.Component.get_value(terminal)
 
     uuid = Universa.Component.get_entity_id(terminal)
@@ -36,7 +36,6 @@ defmodule Universa.System.Account do
 
     case logging_in[:authentication_step] do
       0 ->
-        IO.write("Username #{message}")
         Universa.Component.set_value(logging_in_pid,
           logging_in
           |> Map.put(:authentication_step, 1)
@@ -47,7 +46,6 @@ defmodule Universa.System.Account do
         """)
 
       1 ->
-        IO.write("Password #{message}")
         Universa.Component.remove(logging_in_pid)
 
         {:ok, account} = Universa.Component.Account.new(uuid)

@@ -14,10 +14,10 @@ defmodule Universa.Component do
 
       defstruct entity_id: nil, value: @def_value
 
-      def new(), do: Universa.ComponentSupervisor.add_component(__MODULE__)
+      def new(), do: Universa.ComponentSupervisor.new(__MODULE__)
 
       def new(uuid) do
-        Universa.ComponentSupervisor.add_component(__MODULE__, uuid)
+        Universa.ComponentSupervisor.new(__MODULE__, uuid)
       end
 
       def start_link([uuid]) do
@@ -89,6 +89,6 @@ defmodule Universa.Component do
   end
 
   def remove(pid) do
-    Universa.ComponentSupervisor.rem_component(pid)
+    Universa.ComponentSupervisor.rem(pid)
   end
 end

@@ -1,7 +1,7 @@
 defmodule Universa.Channel.Server do
   # The server channel is custom and does not use Universa.Channel
 
-  defp channel_identifier, do: "server:#{node()}"
+  defp channel_identifier, do: "server"
 
   def add_system(module) do
     Universa.Channel.add_system(channel_identifier(), module)

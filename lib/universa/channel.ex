@@ -1,43 +1,43 @@
 defmodule Universa.Channel do
   # Systems
 
-  def add_system(channel, type) do
-    #TODO: Check 'type', cause it will crash the registry if wrong
-    Registry.register(Universa.ChannelRegistry, "#{channel}_systems", type)
+  def add_system(channel, module) do
+    GenServer.cast(module, {:subscribe_to_channel, channel})
+  end
+
+  def local_add_system(channel, capabilities) do
+    Registry.register(Universa.ChannelRegistry,
+                      "#{channel}_s",
+                      capabilities)
   end
 
   def send(channel, message) do
-    tasks = Enum.map(members_systems(channel), fn {_pid, system} ->
-      try do
-        Task.Supervisor.async_nolink(Universa.SystemSupervisor,
-                                     system,
-                                     :handle,
-                                     [message, channel])
-      rescue
-        _ -> false
-      end
+    tasks = Enum.map(members_systems(channel), fn {pid, requirements} ->
+      Task.async(Universa.System, :handle, [pid, message])
     end)
-    Enum.any?(tasks, fn(task) ->
-      Task.await(task)
-    end)
+    # TODO: Add result checking back in
+    #Enum.any?(tasks, fn(task) ->
+    #  Task.await(task)
+    #end)
+    false
   end
 
   defp members_systems(channel) do
-    Registry.lookup(Universa.ChannelRegistry, "#{channel}_systems")
+    Registry.lookup(Universa.ChannelRegistry, "#{channel}_s")
   end
 
   def rem_system(channel, type) do
-    Registry.unregister_match(Universa.ChannelRegistry, "#{channel}_systems", type)
+    Registry.unregister_match(Universa.ChannelRegistry, "#{channel}_s", type)
   end
 
   # Entities
 
   def subscribe(channel, type) do
-    Registry.register(Universa.ChannelRegistry, "#{channel}_entities", type)
+    Registry.register(Universa.ChannelRegistry, "#{channel}_e", type)
   end
 
   def members(channel) do
-    Registry.lookup(Universa.ChannelRegistry, "#{channel}_entities")
+    Registry.lookup(Universa.ChannelRegistry, "#{channel}_e")
   end
 
   def get_types(channel, types) do
@@ -48,7 +48,7 @@ defmodule Universa.Channel do
   end
 
   def unsubscribe(channel) do
-    Registry.unregister(Universa.ChannelRegistry, "#{channel}_entities")
+    Registry.unregister(Universa.ChannelRegistry, "#{channel}_e")
   end
 
   defmacro __using__(_options) do

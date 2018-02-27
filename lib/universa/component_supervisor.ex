@@ -1,7 +1,7 @@
 defmodule Universa.ComponentSupervisor do
   use DynamicSupervisor
 
-  def start_link(_arg) do
+  def start_link(_) do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
@@ -9,17 +9,17 @@ defmodule Universa.ComponentSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def add_component(type) do
+  def new(type) do
     child_spec = {type, []}
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
-  def add_component(type, entity_uuid) do
+  def new(type, entity_uuid) do
     child_spec = {type, [entity_uuid]}
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
-  def rem_component(pid) do
+  def rem(pid) do
     DynamicSupervisor.terminate_child(__MODULE__, pid)
   end
 

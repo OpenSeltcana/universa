@@ -4,7 +4,10 @@ defmodule Universa.Server do
   require Logger
 
   def start_link(_opts) do
-    Task.start_link(__MODULE__, :accept, [2323])
+    {:ok, pid} = Task.start_link(__MODULE__, :accept, [2323])
+    # Assign the name after creation because `Task` wont do it itself.
+    Process.register(pid, __MODULE__)
+    {:ok, pid}
   end
 
   def accept(port) do
@@ -23,21 +26,21 @@ defmodule Universa.Server do
   end
 
   defp first_serve(socket) do
-    {:ok, component} = Universa.Component.Terminal.new
-    Universa.Component.set_value(component, {:socket, socket})
-    Universa.Channel.Server.send({:player_connect, component})
+    {:ok, terminal} = Universa.Component.Terminal.new
+    Universa.Component.set_value(terminal, {:socket, socket})
+    Universa.Channel.Server.send({:player_connect, terminal})
 
-    serve(socket, component)
+    serve(socket, terminal)
   end
 
-  defp serve(socket, component) do
+  defp serve(socket, terminal) do
     case read_line(socket) do
       {:ok, data} ->
-        Universa.Channel.Server.send({:player_input, component, data})
+        Universa.Channel.Server.send({:player_input, terminal, data})
 
-        serve(socket, component)
+        serve(socket, terminal)
       {:error, :closed} ->
-        Universa.Channel.Server.send({:player_disconnect, component})
+        Universa.Channel.Server.send({:player_disconnect, terminal})
     end
   end
 

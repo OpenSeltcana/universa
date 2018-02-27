@@ -1,1 +1,1 @@
-        You are all set #2#<%= data[:name] %>#r#, enjoy the game!
+        You are all set <%= fg[:purple] %><%= data[:name] %><%= fg[:reset] %>, enjoy the game!

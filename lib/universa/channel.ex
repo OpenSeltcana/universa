@@ -13,7 +13,7 @@ defmodule Universa.Channel do
 
   def send(channel, message) do
     tasks = Enum.map(members_systems(channel), fn {pid, requirements} ->
-      Task.async(Universa.System, :handle, [pid, message])
+      Task.async(fn -> Universa.System.handle(pid, message) end)
     end)
     # TODO: Add result checking back in
     #Enum.any?(tasks, fn(task) ->

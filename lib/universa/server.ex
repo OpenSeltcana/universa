@@ -26,10 +26,18 @@ defmodule Universa.Server do
   end
 
   defp first_serve(socket) do
+    # Create entity by creating a Terminal component
     {:ok, terminal} = Universa.Component.Terminal.new
     Universa.Component.set_value(terminal, {:socket, socket})
+
+    # Get entity id and add Terminal listener
+    uuid = Universa.Component.get_entity_id(terminal)
+    Universa.Channel.Entity.add_system(uuid, Universa.System.Terminal)
+
+    # Now send the connection message to everyone interested
     Universa.Channel.Server.send({:player_connect, terminal})
 
+    # And start the receive loop
     serve(socket, terminal)
   end
 

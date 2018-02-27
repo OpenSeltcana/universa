@@ -12,16 +12,7 @@ defmodule Universa.System.Account do
     # Then send the welcome and login screen
     {:socket, socket} = Universa.Component.get_value(terminal)
 
-    :gen_tcp.send(socket, """
-    \x1B[33m      .-  _             _  -.\r
-         /   /  .         .  \\   \\ \x1B[35m    .   .     o\r
-    \x1B[33m    (   (  (  \x1B[36m (-o-) \x1B[33m  )  )   ) \x1B[35m   |   |,---...    ,,---.,---.,---.,---.\r
-    \x1B[33m     \\   \\_ ` \x1B[36m  |x|\x1B[33m   ` _/   /  \x1B[35m   |   ||   || \\  / |---'|    `---.,---|\r
-    \x1B[33m      `-      \x1B[36m  |x|\x1B[33m        -`   \x1B[35m   `---'`   '`  `'  `---'`    `---'`---^\r
-                  \x1B[36m  |x|\x1B[39m\r
-    \r
-        Enter your nickname, or the one you'd like if you are new here:\r
-    """)
+    Universa.Channel.Entity.send(uuid, {:terminal_message, terminal, [type: :account_welcome]})
   end
 
   capability :player_input, [Universa.Component.LoggingIn]
@@ -41,9 +32,7 @@ defmodule Universa.System.Account do
           |> Map.put(:authentication_step, 1)
           |> Map.put(:username, String.trim(message)))
 
-        :gen_tcp.send(socket, """
-        Seems like you are new here! Please enter a password next:\r
-        """)
+        Universa.Channel.Entity.send(uuid, {:terminal_message, terminal, [type: :account_password]})
 
       1 ->
         Universa.Component.remove(logging_in_pid)
@@ -51,9 +40,7 @@ defmodule Universa.System.Account do
         {:ok, account} = Universa.Component.Account.new(uuid)
         Universa.Component.set_value(account, %{username: logging_in[:username]})
 
-        :gen_tcp.send(socket, """
-        You are all set #{logging_in[:username]}, enjoy the game!\r
-        """)
+        Universa.Channel.Entity.send(uuid, {:terminal_message, terminal, [type: :account_authenticated, name: logging_in[:username]]})
 
         Universa.Channel.Server.send({:player_ready, terminal})
     end

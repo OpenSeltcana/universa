@@ -1,0 +1,1 @@
+        You are all set #2#<%= data[:name] %>#r#, enjoy the game!

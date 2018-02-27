@@ -6,6 +6,7 @@ defmodule Universa.SystemSupervisor do
   end
 
   def init(:ok) do
+    # Get a list of all Systems available at launch and start them.
     Supervisor.init(available_systems(), strategy: :one_for_one)
   end
 

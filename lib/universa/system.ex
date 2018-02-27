@@ -50,24 +50,28 @@ defmodule Universa.System do
     end
   end
 
+  # Macro for automatically adding the System to the server Channel
   defmacro auto_subscribe do
     quote location: :keep do
       @auto_subscribe true
     end
   end
 
+  # Macro for announcing the type of messages we can handle
   defmacro capability(type) do
     quote location: :keep do
       @capabilities [{unquote(type), []} | @capabilities]
     end
   end
 
+  # As above but with a list of required modules
   defmacro capability(type, requires) do
     quote location: :keep do
       @capabilities [{unquote(type), unquote(requires)} | @capabilities]
     end
   end
 
+  # Function for passing events to the System
   def handle(pid, event) do
     GenServer.call(pid, event)
   end

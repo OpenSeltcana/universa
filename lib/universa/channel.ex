@@ -1,7 +1,10 @@
 defmodule Universa.Channel do
+  require Logger
+  
   # Systems
 
   def add_system(channel, module) do
+    Logger.debug "Adding System '#{module}' to Channel '#{channel}'."
     GenServer.cast(module, {:subscribe_to_channel, channel})
   end
 
@@ -33,6 +36,7 @@ defmodule Universa.Channel do
   # Entities
 
   def subscribe(channel, type) do
+    Logger.debug "Adding Component '#{type}' to Channel '#{channel}'"
     Registry.register(Universa.ChannelRegistry, "#{channel}_e", type)
   end
 

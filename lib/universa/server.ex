@@ -4,7 +4,7 @@ defmodule Universa.Server do
   require Logger
 
   def start_link(_opts) do
-    {:ok, pid} = Task.start_link(__MODULE__, :accept, [2323])
+    {:ok, pid} = Task.start_link(__MODULE__, :accept, [Universa.get_config(Server, :port)])
     # Assign the name after creation because `Task` wont do it itself.
     Process.register(pid, __MODULE__)
     {:ok, pid}
@@ -12,8 +12,8 @@ defmodule Universa.Server do
 
   def accept(port) do
     {:ok, socket} = :gen_tcp.listen(port,
-                      [:binary, packet: :line, active: false, reuseaddr: true])
-    Logger.info "Accepting connections on port #{port}"
+      [:binary, packet: :line, active: false, reuseaddr: true])
+    Logger.info "TCP Server started and accepting connections on port #{port}"
     loop_acceptor(socket)
   end
 

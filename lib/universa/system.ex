@@ -15,6 +15,7 @@ defmodule Universa.System do
   defmacro __before_compile__(_env) do
     quote location: :keep do
       use GenServer
+      require Logger
 
       def start_link(_) do
         GenServer.start_link(__MODULE__, nil, name: __MODULE__)
@@ -22,7 +23,9 @@ defmodule Universa.System do
 
       def init(_) do
         if @auto_subscribe, do:
-          Universa.Channel.local_add_system("server", @capabilities)
+        Universa.Channel.local_add_system("server", @capabilities)
+
+	Logger.debug "System #{__MODULE__} is (re)started."
 
         {:ok, nil}
       end

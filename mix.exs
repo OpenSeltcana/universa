@@ -23,6 +23,8 @@ defmodule Universa.MixProject do
   defp deps do
     [
       { :uuid, "~> 1.1" },
+      { :yamerl, "~> 0.4.0" },
+      
       { :credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false }
     ]
   end

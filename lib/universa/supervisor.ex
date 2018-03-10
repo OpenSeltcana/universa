@@ -14,11 +14,17 @@ defmodule Universa.Supervisor do
         name: Universa.ChannelRegistry,
         partitions: System.schedulers_online
       }, id: :channel_registry),
+      # Start the Registry which the `Location` component uses.
+      Supervisor.child_spec({
+        Registry,
+        keys: :unique,
+        name: Universa.LocationRegistry
+      }, id: :location_registry),
       # Start a supervisor for all the accept() tasks of the `Server`.
       Supervisor.child_spec({
         Task.Supervisor,
         name: Universa.NetworkSupervisor,
-      }, id: :network_supervisor),
+	  }, id: :network_supervisor),
       # Start a dynamic supervisor for all the `Component` `GenServer`'s.
       Supervisor.child_spec(Universa.ComponentSupervisor,
         id: :component_supervisor),

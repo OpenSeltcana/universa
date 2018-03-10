@@ -70,6 +70,11 @@ defmodule Universa.Component do
           end)
         {:noreply, newstate}
       end
+
+      def handle_cast({:register, register, value}, state) do
+	Registry.register(register, value, nil)
+	{:noreply, state}
+      end
     end
   end
 
@@ -95,6 +100,10 @@ defmodule Universa.Component do
 
   def set_value(pid, value) do
     GenServer.cast(pid, {:set_value, value})
+  end
+
+  def register(pid, register, value) do
+    GenServer.cast(pid, {:register, register, value})
   end
 
   def remove(pid) do

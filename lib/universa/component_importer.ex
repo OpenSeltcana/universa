@@ -12,9 +12,11 @@ defmodule Universa.ComponentImporter do
     # Create each compononent the way the YAML file tells us to.
     Enum.each(components, fn {component_name, value} ->
       #try do
-	apply(String.to_existing_atom("Elixir.Universa.Component.#{component_name}"), :new, [uuid, value])
+	capitalized = String.capitalize("#{component_name}")
+	apply(String.to_existing_atom("Elixir.Universa.Component.#{capitalized}"), :new, [uuid, value])
       #rescue
-      #  _ -> Logger.error "Error while loading '#{file_path}', when parsing '#{component_name}'"
+      #  _ ->
+	#  Logger.error "Error while loading '#{file_path}', when parsing '#{component_name}'"
       #end
     end)
   end

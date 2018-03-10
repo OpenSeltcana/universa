@@ -46,7 +46,7 @@ defmodule Universa.System.Account do
 	  
           Universa.Channel.Entity.send(uuid, {:terminal_message, terminal, [type: :account_authenticated, name: logging_in[:username]]})
 	  
-          Universa.Channel.Server.send({:player_ready, terminal})
+          Universa.Channel.Server.send({:player_ready, terminal, logging_in[:username]})
 	  
 	  Logger.debug "Player '#{logging_in[:username]}' signed in on Entity '#{uuid}'"
       end

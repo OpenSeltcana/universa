@@ -10,4 +10,9 @@ defmodule Universa do
 
     result
   end
+
+  # Helper module to get configuration variables
+  def get_config(module, type) do
+    Application.get_env(:universa, module)[type]
+  end
 end

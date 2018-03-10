@@ -20,6 +20,15 @@ defmodule Universa.Component do
         Universa.ComponentSupervisor.new(__MODULE__, uuid)
       end
 
+      def new(uuid, value) do
+	Universa.ComponentSupervisor.new(__MODULE__, uuid, value)
+      end
+
+      def start_link([uuid, value]) do
+	GenServer.start_link(__MODULE__,
+               struct(__MODULE__, %{entity_id: uuid, value: value}))
+      end
+
       def start_link([uuid]) do
         GenServer.start_link(__MODULE__,
                              struct(__MODULE__, %{entity_id: uuid}))

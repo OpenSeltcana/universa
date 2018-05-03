@@ -14,6 +14,21 @@ defmodule Universa.SystemAgent do
   end
 
   defp all_systems do
-    %{terminal: [Universa.System.Terminal, Universa.System.Debug], test: [Universa.System.Debug]}
+    # Get a list of all modules in the universa project that implement the Universa.System behaviour
+    with {:ok, modules} <- :application.get_key(:universa, :modules) do
+      modules
+      |> Enum.filter(fn module ->
+        module.module_info[:attributes]
+        |> Keyword.get(:behaviour, [])
+        |> Enum.member?(Universa.System)
+      end)
+    end
+    # Add an entry for every event this system handles in the format of {event, system}
+    |> Enum.flat_map(fn system ->
+      events = apply(system, :events, [])
+      |> Enum.map(fn event -> {event, system} end)
+    end)
+    # Group systems under the same event
+    |> Enum.group_by(&Kernel.elem(&1, 0), &Kernel.elem(&1, 1))
   end
 end

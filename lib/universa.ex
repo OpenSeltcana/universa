@@ -6,6 +6,7 @@ defmodule Universa do
 
     children = [
       Universa.Repo,
+      Universa.SystemAgent
     ]
 
     opts = [strategy: :one_for_one, name: Universa.Supervisor]

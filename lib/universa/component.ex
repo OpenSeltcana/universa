@@ -14,18 +14,18 @@ defmodule Universa.Component do
   def create(uuid, key, value) when is_binary(uuid), do: create(Entity.uuid(uuid), key, value)
 
   def create(entity, key, value) when is_map(entity) do
-  	%Component{entity_id: entity.id, key: key, value: value}
-  	|> Repo.insert
+    %Component{entity_id: entity.id, key: key, value: value}
+    |> Repo.insert
   end
 
   def update(component, value) do
-  	component
-  	|> Ecto.Changeset.cast(%{value: value}, [:value])
-  	|> Repo.update
+    component
+    |> Ecto.Changeset.cast(%{value: value}, [:value])
+    |> Repo.update
   end
 
   def delete(component) do
-  	component
-  	|> Repo.delete
+    component
+    |> Repo.delete
   end
 end

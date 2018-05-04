@@ -6,6 +6,7 @@ defmodule Universa.Entity do
   alias Universa.Repo
   alias Universa.Entity
   alias Universa.Component
+  alias Universa.Event
 
   schema "entities" do
     field :uuid, :string
@@ -13,7 +14,15 @@ defmodule Universa.Entity do
     timestamps()
   end
 
-  def create, do: %Entity{uuid: Ecto.UUID.generate()} |> Repo.insert
+  def create do
+    uuid = Ecto.UUID.generate()
+    result = %Entity{uuid: uuid} |> Repo.insert
+
+    %Event{type: :entity, data: %{action: :create}, target: uuid}
+    |> Event.emit
+
+    result
+  end
 
   def uuid(uuid) do
     Entity
@@ -36,7 +45,12 @@ defmodule Universa.Entity do
   end
 
   def destroy(entity) do
-    entity
+    result = entity
     |> Repo.delete
+
+    %Event{type: :entity, data: %{action: :destroy}, target: entity.uuid}
+    |> Event.emit
+
+    result
   end
 end

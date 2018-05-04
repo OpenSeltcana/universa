@@ -7,13 +7,6 @@ defmodule UniversaTest do
 
   import Ecto.Query
 
-  setup do
-    on_exit fn ->
-      Repo.delete_all(Entity)
-      Repo.delete_all(Component)
-    end
-  end
-
   test "the database works as it should" do
     # assert we can insert and query an entity
     {:ok, owner} = Universa.Entity.create
@@ -24,7 +17,7 @@ defmodule UniversaTest do
     assert {:ok, %{"value" => "value1"}} == Map.fetch(Universa.Entity.component(owner, "list"), :value)
 
     list = Universa.Entity.component(owner, "list")
-    {:ok, _} = Universa.Component.update(list, %{value: "value2"})
+    {:ok, list} = Universa.Component.update(list, %{value: "value2"})
     assert {:ok, %{"value" => "value2"}} == Map.fetch(Universa.Entity.component(owner, "list"), :value)
 
     {:ok, _} = Universa.Entity.destroy(owner)

@@ -9,8 +9,8 @@ defmodule Universa.SystemAgent do
     Agent.get(__MODULE__, &Map.fetch(&1, event))
   end
 
-  def update do
-    Agent.update(__MODULE__, all_systems())
+  def reload do
+    Agent.update(__MODULE__, fn _ -> all_systems() end)
   end
 
   defp all_systems do
@@ -29,7 +29,7 @@ defmodule Universa.SystemAgent do
       |> Enum.map(fn {priority, event} -> {event, priority, system} end)
     end)
     # Sort systems based on priority
-    |> Enum.sort(fn {_event, priority, _system} -> priority end)
+    |> Enum.sort(fn {_event1, priority1, _system1}, {_event2, priority2, _system2}  -> priority1 >= priority2 end)
     # Group systems under the same event
     |> Enum.group_by(&Kernel.elem(&1, 0), &Kernel.elem(&1, 2))
   end

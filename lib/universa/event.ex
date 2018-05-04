@@ -3,14 +3,16 @@ defmodule Universa.Event do
 
   def emit(%Universa.Event{} = event) do
     Task.async(Universa.Event, :run, [event])
+    :ok
   end
 
   def run(event) do
     case Universa.SystemAgent.systems(event.type) do
       {:ok, systems} ->
         Enum.each(systems, fn system ->
-          apply(system, :parse, [event.type, event])
+          apply(system, :event, [event.type, event])
         end)
+        :ok
       _ -> :error
     end
   end

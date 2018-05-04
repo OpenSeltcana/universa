@@ -72,7 +72,18 @@ commit []
    key: "name",
    value: %{value: "Test Entity"}
  }}
-iex(3)> 
+iex(3)> #  ----
+nil
+iex(4)> # Sending an event
+nil
+iex(5)> #  ----
+nil
+iex(6)> event = %Universa.Event{type: :test, data: "Debug me!"}
+%Universa.Event{data: "Debug me!", source: nil, target: nil, type: :test}
+iex(7)> Universa.Event.emit(event)
+:ok
+%Universa.Event{data: "Debug me!", source: nil, target: nil, type: :test}
+%Universa.Event{data: "Debug me!", source: nil, target: nil, type: :test}
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)

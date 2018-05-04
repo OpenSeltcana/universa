@@ -1,7 +1,7 @@
 defmodule System.Debug2 do
   use Universa.System
 
-  parse :test, data do
+  event 00, :test, data do
     IO.inspect data
     :ok
   end

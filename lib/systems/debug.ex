@@ -1,9 +1,9 @@
 defmodule System.Debug do
   use Universa.System
 
-  parse :test2, data, do: parse(:test, data)
+  event 99, :test2, data, do: event(:test, data)
 
-  parse :test, data do
+  event 00, :test, data do
     IO.inspect data
     :ok
   end

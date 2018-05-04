@@ -1,6 +1,6 @@
 defmodule Universa.System do
   @callback events() :: [String.t]
-  @callback parse(atom, any) :: :ok | :error
+  @callback event(atom, any) :: :ok | :error
 
   defmacro __using__(_options) do
     quote location: :keep do
@@ -19,9 +19,9 @@ defmodule Universa.System do
 
   defmacro event(order, type, data, [do: block]), do: parse_header(order, type, data, block)
 
-  defp parse_header(type, data, block) do
+  defp parse_header(order, type, data, block) do
     quote do
-      @events @events ++ [{order, unquote(type)}]
+      @events @events ++ [{unquote(order), unquote(type)}]
 
       def event(unquote(type), unquote(data)), do: unquote(block)
     end

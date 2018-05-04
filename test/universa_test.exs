@@ -7,11 +7,6 @@ defmodule UniversaTest do
 
   import Ecto.Query
 
-  setup_all do
-    {:ok, pid} = Universa.start(nil, nil)
-    {:ok, [pid: pid]}
-  end
-
   setup do
     on_exit fn ->
       Repo.delete_all(Entity)

@@ -35,7 +35,7 @@ defmodule Universa.Entity do
     |> Repo.one
   end
 
-  def delete(entity) do
+  def destroy(entity) do
     entity
     |> Repo.delete
   end

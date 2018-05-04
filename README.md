@@ -17,7 +17,9 @@ To set up the database, first get all dependencies, then create the database and
 
 ```shell
 $ mix deps.get
-$ mix ecto.create ecto.migrate test
+$ mix ecto.create
+$ mix ecto.migrate
+$ mix test
 ```
 
 # Usage

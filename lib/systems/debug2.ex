@@ -1,7 +1,5 @@
-defmodule System.Debug do
+defmodule System.Debug2 do
   use Universa.System
-
-  parse :test2, data, do: parse(:test, data)
 
   parse :test, data do
     IO.inspect data

@@ -17,13 +17,13 @@ defmodule Universa.System do
     end
   end
 
-  defmacro parse(type, data, [do: block]), do: parse_header(type, data, block)
+  defmacro event(order, type, data, [do: block]), do: parse_header(order, type, data, block)
 
   defp parse_header(type, data, block) do
     quote do
-      @events @events ++ [unquote(type)]
+      @events @events ++ [{order, unquote(type)}]
 
-      def parse(unquote(type), unquote(data)), do: unquote(block)
+      def event(unquote(type), unquote(data)), do: unquote(block)
     end
   end
 end

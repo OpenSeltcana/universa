@@ -26,7 +26,7 @@ defmodule Universa.SystemAgent do
     # Add an entry for every event this system handles in the format of {event, system}
     |> Enum.flat_map(fn system ->
       events = apply(system, :events, [])
-      |> Enum.map(fn event -> {event, system} end)
+      |> Enum.map(fn {priority, event} -> {event, {priority, system}} end)
     end)
     # Group systems under the same event
     |> Enum.group_by(&Kernel.elem(&1, 0), &Kernel.elem(&1, 1))

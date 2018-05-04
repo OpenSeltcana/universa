@@ -9,17 +9,17 @@ defmodule UniversaTest do
 
   test "the database works as it should" do
     # assert we can insert and query an entity
-    {:ok, owner} = Universa.Entity.create
+    {:ok, owner} = Entity.create
     assert [owner.uuid] == Entity |> select([owner], owner.uuid) |> Repo.all
 
     # assert we can insert component
-    Universa.Component.create(owner, "list", %{value: "value1"})
-    assert {:ok, %{"value" => "value1"}} == Map.fetch(Universa.Entity.component(owner, "list"), :value)
+    Component.create(owner, "list", %{value: "value1"})
+    assert {:ok, %{"value" => "value1"}} == Map.fetch(Entity.component(owner, "list"), :value)
 
-    list = Universa.Entity.component(owner, "list")
-    {:ok, list} = Universa.Component.update(list, %{value: "value2"})
-    assert {:ok, %{"value" => "value2"}} == Map.fetch(Universa.Entity.component(owner, "list"), :value)
+    list = Entity.component(owner, "list")
+    {:ok, _} = Component.update(list, %{value: "value2"})
+    assert {:ok, %{"value" => "value2"}} == Map.fetch(Entity.component(owner, "list"), :value)
 
-    {:ok, _} = Universa.Entity.destroy(owner)
+    {:ok, _} = Entity.destroy(owner)
   end
 end

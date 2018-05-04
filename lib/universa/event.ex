@@ -2,7 +2,7 @@ defmodule Universa.Event do
   defstruct source: nil, target: nil, type: nil, data: %{}
 
   def emit(%Universa.Event{} = event) do
-    Task.async(Universa.Event, :run, [event])
+    Task.Supervisor.async_nolink(Universa.EventSupervisor, Universa.Event, :run, [event])
     :ok
   end
 

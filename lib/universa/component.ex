@@ -52,5 +52,16 @@ defmodule Universa.Component do
     result
   end
 
-  defp convert_value(value), do: value |> Enum.map(fn {key, value} -> {Atom.to_string(key), value} end) |> Map.new
+  defp convert_value(value) do 
+    value
+    |> Enum.map(fn {key, value} -> {
+      case is_atom(key) do
+        true -> Atom.to_string(key)
+        false -> key
+      end,
+      value
+      } 
+    end)
+    |> Map.new
+  end
 end

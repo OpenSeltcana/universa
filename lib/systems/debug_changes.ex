@@ -15,4 +15,9 @@ defmodule System.Debug2 do
     IO.inspect data
     :ok
   end
+
+  event 0, :telnet, data do
+    IO.inspect data
+    :ok
+  end
 end

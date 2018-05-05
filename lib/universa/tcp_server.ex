@@ -8,7 +8,7 @@ defmodule Universa.TcpServer do
   end
 
   def accept do
-    {:ok, socket} = :gen_tcp.listen(4000, [:binary, packet: :line, active: true, reuseaddr: true, keepalive: true])
+    {:ok, socket} = :gen_tcp.listen(4000, [packet: :line, active: true, reuseaddr: true, keepalive: true])
 
     loop_accept socket
   end

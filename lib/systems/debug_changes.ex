@@ -10,4 +10,9 @@ defmodule System.Debug2 do
     IO.inspect data
     :ok
   end
+
+  event 0, :terminal, data do
+    IO.inspect data
+    :ok
+  end
 end

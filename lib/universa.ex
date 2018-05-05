@@ -7,6 +7,8 @@ defmodule Universa do
     children = [
       Universa.Repo,
       Universa.SystemAgent,
+      Universa.TcpServer,
+      {DynamicSupervisor, name: Universa.TerminalSupervisor, strategy: :one_for_one},
       {Task.Supervisor, name: Universa.EventSupervisor}
     ]
 

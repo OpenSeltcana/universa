@@ -9,8 +9,8 @@ defmodule Universa.Event do
   def run(event) do
     case Universa.SystemAgent.systems(event.type) do
       {:ok, systems} ->
-        Enum.each(systems, fn system ->
-          apply(system, :event, [event.type, event])
+        Enum.each(systems, fn {order, system} ->
+          apply(system, :event, [order, event.type, event])
         end)
         :ok
       _ -> :error

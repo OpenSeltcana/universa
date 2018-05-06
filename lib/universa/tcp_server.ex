@@ -15,7 +15,7 @@ defmodule Universa.TcpServer do
 
   def loop_accept(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
-    {:ok, pid} = DynamicSupervisor.start_child(Universa.TerminalSupervisor, {Universa.Terminal, [socket: client, filters: [Filter.Telnet, Filter.Ascii], shell: Shell.LoginTerminal]})
+    {:ok, pid} = DynamicSupervisor.start_child(Universa.TerminalSupervisor, {Universa.Terminal, [socket: client, filters: [Filter.Telnet, Filter.Ascii], shell: Shell.AuthenticationShell]})
     :ok = :gen_tcp.controlling_process(client, pid)
     loop_accept socket
   end

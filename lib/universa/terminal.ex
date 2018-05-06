@@ -18,21 +18,29 @@ defmodule Universa.Terminal do
 
   ## Client Functions
 
-  def send(pid, event), do: GenServer.cast(pid, {:send, event})
+  def emit(event, pid) do 
+    GenServer.cast(pid, {:send, event})
+  end
 
-  def get(pid), do: GenServer.call(pid, :get)
+  def get(pid, key), do: GenServer.call(pid, {:get, key})
 
-  def set(pid, state), do: GenServer.call(pid, {:set, state})
+  def set(pid, key, value), do: GenServer.cast(pid, {:set, key, value})
 
   ## Server Callbacks
 
-  # Not reall sure about these yet
-  def handle_info({_, :ok}, state), do: {:noreply, state}
-  def handle_info({_, :error}, state), do: {:noreply, state}
-  def handle_info({:DOWN, _, :process, _, :normal}, state), do: {:noreply, state}
+  # Something needs to read something out of us!
+  def handle_call({:get, key}, _pid, state) do
+    {:reply, Map.fetch(state, key), state}
+  end
+
+  # Something needs to store something inside us!
+  def handle_cast({:set, key, value}, state) do
+    {:noreply, Map.update(state, key, nil, value)}
+  end
 
   # Player received something
   def handle_cast({:send, event}, %{filters: filters, shell: shell} = state) do
+    IO.inspect {"Outgoing:", event}
     {packet, new_state} = apply(shell, :output, [event, state])
     msg = run_filters(packet, :put, state, Enum.reverse(filters))
 
@@ -52,10 +60,17 @@ defmodule Universa.Terminal do
     {:noreply, new_state}
   end
 
-  # Socket disconnected, kill the Terminal
-  def handle_info({:tcp_closed, _socket}, state) do
-    {:stop, :normal, state}
+  # Socket disconnected, kill the Shell and Terminal
+  def handle_info({:tcp_closed, _socket}, %{shell: shell} = state) do
+    {events, new_state} = apply(shell, :on_unload, [state])
+
+    Enum.each(events, fn event -> Event.emit(event) end)
+
+    {:stop, :normal, new_state}
   end
+
+  # Don't crash when we receive other messages (Erlang likes to send those.)
+  def handle_info(_, state), do: {:noreply, state}
 
   defp run_filters(msg, _fun, _state, []), do: msg
 

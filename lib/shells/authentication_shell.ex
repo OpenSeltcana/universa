@@ -1,4 +1,4 @@
-defmodule Shell.LoginTerminal do
+defmodule Shell.AuthenticationShell do
   use Universa.Shell
 
   alias Universa.Event
@@ -11,9 +11,17 @@ defmodule Shell.LoginTerminal do
 
   def input(packet, state) do
     events = [%Event{type: :terminal, data: %{type: :input, msg: packet}}]
-    
 
     {events, state}
+  end
+
+  def output(%Event{type: :terminal, data: %{type: :output, msg: packet}}, state) do
+    {"#{packet}", state}
+  end
+
+  def output(_, state) do
+    IO.write "We received spam, truly!?"
+    {"", state}
   end
 
   def on_unload(state), do: {[], state}

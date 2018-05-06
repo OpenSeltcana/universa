@@ -21,16 +21,11 @@ defmodule Filter.Telnet do
       case chars do
         [255] -> :IAC
         [255,240] -> :SE
-        [255,241] -> :NOP
         [255,250] -> :SB
         [255,251] -> :WILL
         [255,252] -> :WONT
         [255,253] -> :DO
         [255,254] -> :DONT
-        [255,x,1] when x in 251..254 -> :BINARY
-        [255,x,2] when x in 251..254 -> :ECHO
-        [255,x,24] when x in 251..254 -> :TTYPE
-        [255,x,31] when x in 251..254 -> :NAWS
         _ -> :UNK
       end
     end
@@ -56,19 +51,17 @@ defmodule Filter.Telnet do
           end
         {1, chars} ->
           if char == 240 do
-            {{Enum.take(chars, length(chars)-1)}, false}
+            {chars ++ [char], false}
           else
             {nil, {0, chars ++ [char]}}
           end
         {chars} ->
           translation = translations.(chars ++ [char])
           if translation == :SB do
-            {nil, {0, []}}
+            {nil, {0, chars ++ [char]}}
           else
             if not translation in [:WILL,:WONT,:DO,:DONT] do
-              {Enum.map(1..length(chars), fn x ->
-                translations.(Enum.take(chars, x))
-              end) ++ [translation], false}
+              {chars ++ [char], false}
             else
               {nil, {chars ++ [char]}}
             end

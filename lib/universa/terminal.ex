@@ -7,12 +7,15 @@ defmodule Universa.Terminal do
     do: GenServer.start_link(__MODULE__, %{socket: socket, filters: filters, shell: shell})
 
   def init(%{socket: socket, filters: filters, shell: shell}) do
-    state = apply(shell, :on_load, [%{
+    {events, state} = apply(shell, :on_load, [%{
       terminal: self(),
       socket: socket,
       shell: shell,
       filters: filters
     }])
+
+    Enum.each(events, fn event -> Event.emit(event) end)
+
     {:ok, state}
   end
 

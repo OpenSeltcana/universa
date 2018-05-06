@@ -4,9 +4,12 @@ defmodule Shell.AuthenticationShell do
   alias Universa.Event
 
   def on_load(state) do
-    # Tell client we support TELNET and want window size and client type
-    :gen_tcp.send(state.socket, "\xff\xfd\x1f\xff\xfd\x18")
-    state
+    # TODO: Send all telnet commands only AFTER confirming client supports telnet
+    events = [
+      %Event{type: :telnet, data: %{type: :start, from: state.terminal}}
+    ]
+
+    {events, state}
   end
 
   def input(packet, state) do
@@ -15,8 +18,17 @@ defmodule Shell.AuthenticationShell do
     {events, state}
   end
 
-  def output(%Event{type: :terminal, data: %{type: :output, msg: packet}}, state) do
-    {"#{packet}", state}
+  # Raw templates get send unchanged (usually for telnet commands)
+  def output(%Event{type: :terminal, data: %{type: :output, template: :raw, metadata: msg}} = event, state) do
+    {msg, state}
+  end
+
+  # All other messsages are templates that get filled in
+  def output(%Event{type: :terminal, data: %{type: :output, template: template}} = event, state) do
+    metadata = Map.get(event.data, :metadata, [])
+    {:ok, msg} = Universa.Template.fill(template, metadata)
+
+    {msg, state}
   end
 
   def output(_, state) do

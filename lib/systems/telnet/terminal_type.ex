@@ -3,11 +3,16 @@ defmodule Systems.Telnet.TerminalType do
 
   alias Universa.Event
 
-  # When receiving IAC WILL TERMINAL-TYPE
+  # Tell the client to do terminal type!
+  event 50, :telnet, %Event{data: %{type: :start, from: terminal}} do
+    %Event{type: :terminal, data: %{type: :output, template: "telnet/do_terminal_type.eex"}}
+    |> Universa.Terminal.emit(terminal)
+  end
+
+  # When client tells us it does terminal type
   event 50, :telnet, %Event{data: %{command: [255, 251, 24], from: terminal}} do
-    IO.inspect terminal
-    # Send IAC SB TERMINAL-TYPE SEND IAC SE
-    %Event{type: :terminal, data: %{type: :output, msg: "\xff\xfa\x18\x01\xff\xf0"}}
+    # Ask the client to send us the terminal type
+    %Event{type: :terminal, data: %{type: :output, template: "telnet/send_terminal_type.eex"}}
     |> Universa.Terminal.emit(terminal)
   end
 

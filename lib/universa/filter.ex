@@ -1,6 +1,6 @@
 defmodule Universa.Filter do
-  @callback get(list, map) :: list
-  @callback put(list, map) :: list
+  @callback get(list, map) :: {list, map}
+  @callback put(list, map) :: {list, map}
 
   defmacro __using__(_options) do
     quote location: :keep do

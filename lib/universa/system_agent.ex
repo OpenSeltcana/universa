@@ -30,8 +30,8 @@ defmodule Universa.SystemAgent do
     end)
     # Sort systems based on priority
     |> Enum.sort(fn {_event1, priority1, _system1}, {_event2, priority2, _system2} -> priority1 >= priority2 end)
-    # Remove any duplicates
-    #|> Enum.uniq
+    # Remove any duplicates (because they are checking different events)
+    |> Enum.uniq
     # Group systems under the same event
     |> Enum.group_by(&Kernel.elem(&1, 0), &({elem(&1, 1), elem(&1, 2)}))
   end

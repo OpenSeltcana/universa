@@ -6,15 +6,14 @@ defmodule Filter.Telnet do
   def get(packet, state) do
     {text, telnet} = filter_telnet(packet)
 
-    Enum.each(telnet, fn command ->
+    events = Enum.map(telnet, fn command ->
       %Event{type: :telnet, data: %{from: state.terminal, command: command}}
-      |> Event.emit
     end)
 
-    text
+    {text, events}
   end
 
-  def put(packet, _state), do: packet
+  def put(packet, _state), do: {packet, []}
 
   defp filter_telnet(input) do
     translations = fn(chars) ->

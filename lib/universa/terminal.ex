@@ -40,18 +40,21 @@ defmodule Universa.Terminal do
 
   # Player received something
   def handle_cast({:send, event}, %{filters: filters, shell: shell} = state) do
-    IO.inspect {"Outgoing:", event}
     {packet, new_state} = apply(shell, :output, [event, state])
-    msg = run_filters(packet, :put, state, Enum.reverse(filters))
+    {unfiltered_msg, unfilter_events} = run_filters(packet, [], :put, state, Enum.reverse(filters))
 
-    :gen_tcp.send(state.socket, msg)
+    :gen_tcp.send(state.socket, unfiltered_msg)
+
+    Enum.each(unfilter_events, fn event -> Event.emit(event) end)
 
     {:noreply, new_state}
   end
 
   # Player typed something
   def handle_info({:tcp, socket, msg}, %{filters: filters, shell: shell} = state) do
-    filtered_msg = run_filters(msg, :get, state, filters)
+    {filtered_msg, filter_events} = run_filters(msg, [], :get, state, filters)
+
+    Enum.each(filter_events, fn event -> Event.emit(event) end)
 
     {events, new_state} = apply(shell, :input, [filtered_msg, state])
 
@@ -72,10 +75,10 @@ defmodule Universa.Terminal do
   # Don't crash when we receive other messages (Erlang likes to send those.)
   def handle_info(_, state), do: {:noreply, state}
 
-  defp run_filters(msg, _fun, _state, []), do: msg
+  defp run_filters(msg, events, _fun, _state, []), do: {msg, events}
 
-  defp run_filters(msg, fun, state, [filter | others]) do
-    apply(filter, fun, [msg, state])
-    |> run_filters(fun, state, others)
+  defp run_filters(msg, events, fun, state, [filter | others]) do
+    {new_msg, new_events} = apply(filter, fun, [msg, state])
+    run_filters(new_msg, new_events ++ events, fun, state, others)
   end
 end

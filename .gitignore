@@ -24,3 +24,6 @@ universa-*.tar
 
 # Don't upload the database
 universa.sqlite3*
+
+# Don't upload release configuration (especially the cookies)
+/rel/

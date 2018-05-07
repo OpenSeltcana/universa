@@ -36,8 +36,27 @@ defmodule Universa.Terminal do
   end
 
   # Something needs to store something inside us!
+  def handle_cast({:set, key, func}, state) when is_function(func) do
+    {:noreply, Map.update(state, key, func.(nil), func)}
+  end
+
   def handle_cast({:set, key, value}, state) do
-    {:noreply, Map.update(state, key, nil, value)}
+    {:noreply, Map.update(state, key, value, fn _ -> value end)}
+  end
+
+  # Shell is being switched out for another
+  def handle_cast({:change_shell, shell_new}, %{shell: shell_old} = state_old) do
+    {old_events, shel_state_transition} = apply(shell_old, :on_unload, [state_old])
+
+    Universa.Event.emit(old_events)
+
+    {new_events, shell_state_new} = apply(shell_new, :on_load, [
+      %{state_old | shell_state: shel_state_transition}
+    ])
+
+    Universa.Event.emit(new_events)
+
+    {:noreply, %{state_old | shell: shell_new, shell_state: shell_state_new}}
   end
 
   # Player received something
@@ -47,7 +66,7 @@ defmodule Universa.Terminal do
 
     :gen_tcp.send(socket, unfiltered_msg)
 
-    Enum.each(unfilter_events, fn event -> Event.emit(event) end)
+    Event.emit(unfilter_events)
 
     {:noreply, %{state | shell_state: new_state}}
   end
@@ -60,7 +79,7 @@ defmodule Universa.Terminal do
 
     {events, new_state} = apply(shell, :input, [filtered_msg, state])
 
-    Enum.each(events, fn event -> Event.emit(event) end)
+    Event.emit(events)
 
     {:noreply, %{state | shell_state: new_state}}
   end

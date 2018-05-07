@@ -64,6 +64,6 @@ defmodule Systems.Telnet.TerminalType do
     terminal_type = Enum.take(client, length(client)-2)
 
     # Store it in the terminal
-    Universa.Terminal.set(terminal, :telnet_terminal_type, fn _ -> terminal_type end)
+    Universa.Terminal.set(terminal, :telnet_terminal_type, terminal_type)
   end
 end

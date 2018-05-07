@@ -1,4 +1,4 @@
-defmodule System.Debug2 do
+defmodule System.Debug do
   use Universa.System
 
   event 0, :component, data do

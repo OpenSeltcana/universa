@@ -5,7 +5,7 @@ defmodule Universa.Template do
 
   def fill(file, data) do
     t = %{
-      fg: [
+      fg: %{
         black: "\e[0;30m",
         red: "\e[0;31m",
         green: "\e[0;32m",
@@ -23,8 +23,8 @@ defmodule Universa.Template do
         bcyan: "\e[36;1m",
         bwhite: "\e[37;1m",
         reset: "\e[39;0m"
-      ],
-      bg: [
+      },
+      bg: %{
         black: "\e[40m",
         red: "\e[41m",
         green: "\e[42m",
@@ -42,11 +42,11 @@ defmodule Universa.Template do
         bcyan: "\e[106m",
         bwhite: "\e[107m",
         reset: "\e[49m"
-      ],
-      telnet: [
+      },
+      telnet: %{
         stop_echo: "\xff\xfd\x01",
         continue_echo: "\xff\xfc\x01"
-      ]
+      }
     }
     
     # TODO: Catch it when things try to run non-existing templates

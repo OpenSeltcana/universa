@@ -35,11 +35,11 @@ defmodule System.Telnet.Naws do
   # When receiving an update of the client's window size
   event 50, :telnet, %Event{
       data: %{
-        command: [255, 250, 31, 0, w, 0, h, 255, 240],
+        command: [255, 250, 31, 0, h, 0, w, 255, 240],
         from: terminal
       }
     } do
     # Store it in the terminal
-    Universa.Terminal.set(terminal, :telnet_naws, fn _ -> [width: w, height: h] end)
+    Universa.Terminal.set(terminal, :telnet_naws, {w, h})
   end
 end

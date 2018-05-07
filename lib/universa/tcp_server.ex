@@ -33,7 +33,7 @@ defmodule Universa.TcpServer do
         [
           socket: client, 
           filters: [Filter.Telnet, Filter.Ascii], 
-          shell: Shell.AuthenticationShell
+          shell: Shell.Authentication
         ]
       }
     )

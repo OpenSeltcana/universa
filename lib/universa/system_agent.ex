@@ -5,6 +5,7 @@ defmodule Universa.SystemAgent do
     Agent.start_link(fn -> all_systems() end, name: __MODULE__)
   end
 
+  # Get all systems with a function for this event type
   def systems(event) do
     Agent.get(__MODULE__, &Map.fetch(&1, event))
   end
@@ -13,6 +14,7 @@ defmodule Universa.SystemAgent do
     Agent.update(__MODULE__, fn _ -> all_systems() end)
   end
 
+  # Returns an ordered list of all systems, keyed by event type
   defp all_systems do
     # Get a list of all modules in the universa project that implement the Universa.System behaviour
     with {:ok, modules} <- :application.get_key(:universa, :modules) do

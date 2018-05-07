@@ -7,23 +7,22 @@ defmodule Universa.Terminal do
     do: GenServer.start_link(__MODULE__, %{socket: socket, filters: filters, shell: shell})
 
   def init(%{socket: socket, filters: filters, shell: shell}) do
-    {events, state} = apply(shell, :on_load, [%{
+    state = %{
       terminal: self(),
       socket: socket,
       shell: shell,
+      shell_state: %{},
       filters: filters
-    }])
+    }
+
+    {events, new_state} = apply(shell, :on_load, [state])
 
     Enum.each(events, fn event -> Event.emit(event) end)
 
-    {:ok, state}
-  end
+    {:ok, %{state | shell_state: new_state}}
+  end 
 
   ## Client Functions
-
-  def emit(event, pid) do 
-    GenServer.cast(pid, {:send, event})
-  end
 
   def get(pid, key), do: GenServer.call(pid, {:get, key})
 
@@ -42,19 +41,19 @@ defmodule Universa.Terminal do
   end
 
   # Player received something
-  def handle_cast({:send, event}, %{filters: filters, shell: shell} = state) do
+  def handle_cast({:send, event}, %{filters: filters, shell: shell, socket: socket} = state) do
     {packet, new_state} = apply(shell, :output, [event, state])
     {unfiltered_msg, unfilter_events} = run_filters(packet, [], :put, state, Enum.reverse(filters))
 
-    :gen_tcp.send(state.socket, unfiltered_msg)
+    :gen_tcp.send(socket, unfiltered_msg)
 
     Enum.each(unfilter_events, fn event -> Event.emit(event) end)
 
-    {:noreply, new_state}
+    {:noreply, %{state | shell_state: new_state}}
   end
 
   # Player typed something
-  def handle_info({:tcp, socket, msg}, %{filters: filters, shell: shell} = state) do
+  def handle_info({:tcp, _socket, msg}, %{filters: filters, shell: shell} = state) do
     {filtered_msg, filter_events} = run_filters(msg, [], :get, state, filters)
 
     Enum.each(filter_events, fn event -> Event.emit(event) end)
@@ -63,7 +62,7 @@ defmodule Universa.Terminal do
 
     Enum.each(events, fn event -> Event.emit(event) end)
 
-    {:noreply, new_state}
+    {:noreply, %{state | shell_state: new_state}}
   end
 
   # Socket disconnected, kill the Shell and Terminal
@@ -72,7 +71,7 @@ defmodule Universa.Terminal do
 
     Enum.each(events, fn event -> Event.emit(event) end)
 
-    {:stop, :normal, new_state}
+    {:stop, :normal, %{state | shell_state: new_state}}
   end
 
   # Don't crash when we receive other messages (Erlang likes to send those.)

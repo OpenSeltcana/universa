@@ -48,17 +48,8 @@ defmodule Universa.Template do
         continue_echo: "\xff\xfc\x01"
       ]
     }
-    try do
-      name = String.to_atom(String.replace("file_templates_#{file}", "/", "_"))
-
-      {:ok, apply(__MODULE__, name, [t, data])}
-    rescue
-      _ in UndefinedFunctionError -> {:error, :not_found}
-    end
+    
+    # TODO: Catch it when things try to run non-existing templates
+    {:ok, EEx.eval_file("templates/#{file}", [t: t, data: data])}
   end
-
-  Enum.each(Path.wildcard("templates/**/*.eex"), fn file ->
-    name = String.to_atom(String.replace("file_#{file}", "/", "_"))
-    EEx.function_from_file :def, name, file, [:t, :data]
-  end)
 end

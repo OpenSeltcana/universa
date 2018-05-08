@@ -1,0 +1,4 @@
+<%= t.fg.magenta %>== <%= t.fg.bblue %>help <%= t.fg.magenta %>==<%= t.fg.reset %>
+Hi there! Currently the commands supported are:
+- help
+

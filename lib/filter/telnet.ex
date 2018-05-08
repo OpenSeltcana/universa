@@ -31,36 +31,43 @@ defmodule Filter.Telnet do
 
     {mask, _} = Enum.map_reduce(input, false, fn(char, set) ->
       case set do
+        # If not doing telnet, do this
         false ->
+          # This is IAC, move to telnet code
           if char == 255 do
             {nil, {[char]}}
           else
-            # filter out non-readable except newlines
-            if (char >= 20 and char <= 126) or char == 12 do
-              {char, false}
-            else
-              {nil, false}
-            end
+            {char, false}
           end
+        # If we are in subnegotiation
         {0, chars} ->
+          # If we read an IAC, move to code just below
           if char == 255 do
             {nil, {1, chars ++ [char]}}
+          # Else just keep adding the byte to our list of bytes so far
           else
             {nil, {0, chars ++ [char]}}
           end
         {1, chars} ->
-          if char == 240 do
-            {chars ++ [char], false}
-          else
-            {nil, {0, chars ++ [char]}}
+          case char do
+            # IAC SE, end subnegotation
+            240 -> {chars ++ [char], false}
+            # In subnegotiation IAC IAC means one 255
+            255 -> {nil, {0, chars}}
+            # Write all other characters, even if this should never happen
+            _ -> {nil, {0, chars ++ [char]}}
           end
+        # If we read an IAC, start parsing the next byte
         {chars} ->
           translation = translations.(chars ++ [char])
+          # Move to subnegotiation code
           if translation == :SB do
             {nil, {0, chars ++ [char]}}
           else
+            # If this is any of will, wont, do, dont, read the next byte too
             if not translation in [:WILL,:WONT,:DO,:DONT] do
               {chars ++ [char], false}
+            # If not, read the byte after IAC and exit telnet mode
             else
               {nil, {chars ++ [char]}}
             end

@@ -12,6 +12,9 @@ defmodule System.Telnet.Naws do
 
   use Universa.System
 
+  # For shifting things 8 bits
+  use Bitwise
+
   alias Universa.Event
 
   # Tell the client to do Native Window Size updates!
@@ -35,11 +38,11 @@ defmodule System.Telnet.Naws do
   # When receiving an update of the client's window size
   event 50, :telnet, %Event{
       data: %{
-        command: [255, 250, 31, 0, h, 0, w, 255, 240],
+        command: [255, 250, 31, w1, w0, h1, h0, 255, 240],
         from: terminal
       }
     } do
     # Store it in the terminal
-    Universa.Terminal.set(terminal, :telnet_naws, {w, h})
+    Universa.Terminal.set(terminal, :telnet_naws, {(w1 <<< 8) + w0, (h1 <<< 8) + h0})
   end
 end

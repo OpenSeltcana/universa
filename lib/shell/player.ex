@@ -56,29 +56,29 @@ defmodule Shell.Player do
     }
   end
 
-  # 
+  # Player typed something
   def input(packet, %{terminal: terminal, shell_state: %{uuid: uuid} = state}) do
     ent = Universa.Entity.uuid(uuid)
 
     parsers = ent
     |> Universa.Entity.component("parser")
 
-    case Enum.any?(parsers.value["list"], fn [_order, parser] ->
-      apply(String.to_existing_atom(parser), :parse, ["#{packet}", ent])
-    end) do
-      true -> {[], state}
-      false -> {
-        [
-          %Event{
-            type: :terminal,
-            data: %{
-              type: :output,
-              template: "parser/not_found.eex",
-              to: terminal
+    case Universa.Parser.each("#{packet}", ent, parsers.value["list"]) do
+      {:stop, events} -> {events, state}
+      {:keep_going, events} -> 
+        {
+          events ++ [
+            %Event{
+              type: :terminal,
+              data: %{
+                type: :output,
+                template: "parser/not_found.eex",
+                to: terminal
+              }
             }
-          }
-        ],
-        state}
+          ],
+          state
+        }
     end
   end
 

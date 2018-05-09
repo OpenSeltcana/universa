@@ -4,16 +4,17 @@ defmodule Parser.Help do
   alias Universa.Event
 
   def parse("help", entity) do
-    %Event{
-      type: :terminal,
-      target: entity.uuid,
-      data: %{
-        type: :output,
-        template: "parser/help.eex"
+    events = [
+      %Event{
+        type: :terminal,
+        target: entity.uuid,
+        data: %{
+          type: :output,
+          template: "parser/help.eex"
+        }
       }
-    }
-    |> Event.emit
+    ]
 
-    true
+    {:stop, events}
   end
 end

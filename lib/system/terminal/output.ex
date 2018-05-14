@@ -13,9 +13,13 @@ defmodule System.Terminal.Output do
   event 99, :terminal, %Event{data: %{type: :output}, target: uuid} = event do
     # Can't do this in a guard because of the = event part
     if not is_nil(uuid) do
-      [{terminal, nil}] = Registry.lookup(Universa.Registry.Terminal, uuid)
-      GenServer.cast(terminal, {:send, event})
-      :ok
+      case Registry.lookup(Universa.Registry.Terminal, uuid) do
+        [{terminal, nil}] -> # We found the terminal connected to that uuid
+          GenServer.cast(terminal, {:send, event})
+          :ok
+        [] -> # We did not find the terminal
+          :error
+      end
     else
       :error
     end

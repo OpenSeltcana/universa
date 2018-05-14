@@ -49,7 +49,8 @@ defmodule Shell.Player do
     Universa.Component.create(ent, "parser", %{
       list: [
         [50, Parser.Help],
-        [50, Parser.Say]
+        [50, Parser.Say],
+        [50, Parser.OOC]
       ]
     })
 

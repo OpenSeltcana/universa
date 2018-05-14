@@ -1,0 +1,1 @@
+ <% t.fg.bgreen %><%= Universa.Entity.component(data.from, "name").value["value"] %> <OOC> <%= data.message %><%= if not String.ends_with?(data.message, [".","?","!"]) do %>.<% end %>

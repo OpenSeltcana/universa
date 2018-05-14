@@ -6,29 +6,11 @@ defmodule Parser.Say do
   def parse("say " <> message, entity) do
     events = [
       %Event{
-        type: :terminal,
+        type: :speech,
         source: entity.uuid,
         data: %{
-          type: :output,
-          template: "parser/say.eex",
-          metadata: [
-            from: entity.uuid,
-            message: message,
-            to: nil
-          ]
-        }
-      },
-      %Event{
-        type: :terminal,
-        target: entity.uuid,
-        data: %{
-          type: :output,
-          template: "parser/say.eex",
-          metadata: %{
-            from: entity.uuid,
-            to: nil,
-            message: message
-          }
+          message: message,
+          volume: 70 # 70 dB is normal voice according to engineeringtoolbox.com
         }
       }
     ]

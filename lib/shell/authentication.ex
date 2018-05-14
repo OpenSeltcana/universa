@@ -60,6 +60,14 @@ defmodule Shell.Authentication do
               to: terminal
             }
           },
+          %Event{
+            type: :terminal,
+            data: %{
+              type: :output,
+              template: "telnet/will_echo.eex",
+              to: terminal
+            }
+          },
         ]
 
         {events, %{state | step: :password, username: packet}}
@@ -77,6 +85,14 @@ defmodule Shell.Authentication do
             data: %{
               type: :output,
               template: "authentication/authenticated.eex",
+              to: terminal
+            }
+          },
+          %Event{
+            type: :terminal,
+            data: %{
+              type: :output,
+              template: "telnet/wont_echo.eex",
               to: terminal
             }
           },

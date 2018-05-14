@@ -40,6 +40,8 @@ defmodule Shell.Player do
 
     Universa.Component.create(ent, "name", %{value: "New Person (#{username})"})
 
+    Universa.Channel.add("players", ent.uuid)
+
     # Use custom registry, because we cant store PIDs in ecto in a safe way.
     {:ok, _} = Registry.register(Universa.Registry.Terminal, ent.uuid, nil)
 
@@ -116,6 +118,8 @@ defmodule Shell.Player do
     |> Universa.Entity.destroy
 
     Registry.unregister(Universa.Registry.Terminal, uuid)
+
+    Universa.Channel.remove("players", uuid)
 
     {[], state}
   end

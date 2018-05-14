@@ -32,7 +32,7 @@ defmodule Universa.TcpServer do
         Universa.Terminal, 
         [
           socket: client, 
-          filters: [Filter.Telnet, Filter.Ascii], 
+          filters: [Filter.MCCP, Filter.Telnet, Filter.Ascii], 
           shell: Shell.Authentication
         ]
       }

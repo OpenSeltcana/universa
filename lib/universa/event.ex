@@ -9,7 +9,6 @@ defmodule Universa.Event do
       :run,
       [event]
     )
-    :ok
   end
 
   # If we received a list of events, just run emit on each individually

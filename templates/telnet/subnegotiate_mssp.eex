@@ -1,0 +1,1 @@
+<%= "\xff\xfa\x46\x01" %>NAME<%= "\x02" %>Universa<%= "\x01" %>PLAYERS<%= "\x02" %><%= data.players %><%= "\x01" %>PORT<%= "\x02" %>4000<%= "\x01" %>UPTIME<%= "\x02" %><%= data.uptime %><%= "\xff\xf0" %>

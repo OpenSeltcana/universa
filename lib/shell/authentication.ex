@@ -70,7 +70,7 @@ defmodule Shell.Authentication do
           },
         ]
 
-        {events, %{state | step: :password, username: packet}}
+        {events, %{state | step: :password, username: String.capitalize("#{packet}")}}
     end
   end
 

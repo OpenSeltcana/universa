@@ -40,12 +40,12 @@ defmodule Universa.Terminal do
     {:noreply, Map.update(state, key, func.(nil), func)}
   end
 
-  def handle_cast({:set, key, value}, state) do
-    {:noreply, Map.update(state, key, value, fn _ -> value end)}
-  end
-
   def handle_cast({:set, key, nil}, state) do
     {:noreply, Map.delete(state, key)}
+  end
+
+  def handle_cast({:set, key, value}, state) do
+    {:noreply, Map.update(state, key, value, fn _ -> value end)}
   end
 
   # Shell is being switched out for another

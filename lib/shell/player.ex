@@ -39,6 +39,7 @@ defmodule Shell.Player do
     {:ok, ent} = Universa.Entity.create
 
     Universa.Component.create(ent, "name", %{value: "New Person (#{username})"})
+    Universa.Component.create(ent, "location", %{value: "start"})
 
     Universa.Channel.add("players", ent.uuid)
 

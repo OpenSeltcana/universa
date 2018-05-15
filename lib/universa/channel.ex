@@ -48,7 +48,6 @@ defmodule Universa.Channel do
   # Add uuid to list
   def add(id, uuid) do
     channel = to_row(id)
-    IO.inspect channel
     entities = String.split(channel.entities, ",", trim: true)
     updated_entities = [uuid | entities]
 

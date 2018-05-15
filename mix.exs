@@ -15,7 +15,7 @@ defmodule Universa.MixProject do
   def application do
     [
       mod: {Universa, []},
-      extra_applications: [:logger, :sqlite_ecto2, :ecto]
+      extra_applications: [:logger, :sqlite_ecto2, :ecto, :yaml_elixir]
     ]
   end
 
@@ -23,6 +23,7 @@ defmodule Universa.MixProject do
   defp deps do
     [
 #      {:distillery, "~> 1.5", runtime: false},
+      {:yaml_elixir, "~> 2.0"},
       {:poison, "~> 3.1"}, # For converting maps to JSON
       {:ecto, "~> 2.2"}, # For interface with databases and UUID generation
       {:sqlite_ecto2, "~> 2.2"} # Adapter for ecto to connect to sqlite3 databases

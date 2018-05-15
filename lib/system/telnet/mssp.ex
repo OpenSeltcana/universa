@@ -11,7 +11,7 @@ defmodule System.Telnet.MSSP do
 
   alias Universa.Event
 
-  # Tell the client to do Native Window Size updates!
+  # When telnet is started, notify we support MSSP!
   event 50, :telnet, %Event{
       data: %{
         type: :start, 
@@ -29,13 +29,15 @@ defmodule System.Telnet.MSSP do
     |> Event.emit
   end
 
-  # When receiving an update of the client's window size
+  # When MSSP request is received, send the message!
   event 50, :telnet, %Event{
       data: %{
-        command: [255, 251, 70],
+        command: [255, 253, 70],
         from: terminal
       }
     } do
+    # Collect information
+    {:ok, version} = :application.get_key(:universa, :vsn)
     # Send up to date information
     %Event{
       type: :terminal,
@@ -44,9 +46,14 @@ defmodule System.Telnet.MSSP do
         template: "telnet/subnegotiate_mssp.eex",
         to: terminal,
         metadata: %{
-          name: "Universa",
-          players: length(Universa.Channel.get("players")),
-          uptime: -1 # TODO: Figure out where to keep track of this
+          "NAME" => "Universa",
+          "PORT" => 4000,
+          "CODEBASE" => "Universa #{List.to_string(version)}",
+          "FAMILY" => "Custom",
+          "ANSI" => 1,
+          "MCCP" => 1,
+          "PLAYERS" => length(Universa.Channel.get("players")),
+          "UPTIME" => -1 # TODO: Figure out where to keep track of this
         }
       }
     }

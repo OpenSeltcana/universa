@@ -1,5 +1,7 @@
-defmodule Universa.TcpServer do
+defmodule Universa.SSLServer do
   use Task, restart: :permanent
+
+  alias :ssl, as: SSL
 
   # Start a task that runs forever for the server port
   def start_link([]) do
@@ -10,7 +12,9 @@ defmodule Universa.TcpServer do
 
   # Open the listening port
   def listen do
-    {:ok, socket} = :gen_tcp.listen(4000, [
+    {:ok, socket} = SSL.listen(4001, [
+        certfile: "certificate.pem",
+        keyfile: "key.pem",
         packet: :line, 
         active: true, # Send messages instead of blocking calls
         reuseaddr: true, # To avoid issues when doing quick restarts
@@ -24,7 +28,10 @@ defmodule Universa.TcpServer do
   # This function loops forever, accepting connections endlessly
   def loop_accept(socket) do
     # Wait for a new connection and accept it
-    {:ok, client} = :gen_tcp.accept(socket)
+    {:ok, client} = SSL.transport_accept(socket)
+
+    # Finish the SSL negotiation
+    :ok = SSL.ssl_accept(client)
 
     # Create a Terminal with default filters and shell
     {:ok, pid} = DynamicSupervisor.start_child(Universa.TerminalSupervisor, 
@@ -34,15 +41,15 @@ defmodule Universa.TcpServer do
           socket: client, 
           filters: [Filter.MCCP, Filter.Telnet, Filter.Ascii], 
           shell: Shell.Authentication,
-          ssl: false
+          ssl: true
         ]
       }
     )
 
     # Hand ownership to the newly created Terminal, so it receives messages
-    :ok = :gen_tcp.controlling_process(client, pid)
+    :ok = SSL.controlling_process(client, pid)
 
     # Full module name so it automatically uses a newer version if available
-    Universa.TcpServer.loop_accept socket
+    Universa.SSLServer.loop_accept socket
   end
 end

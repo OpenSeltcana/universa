@@ -15,7 +15,7 @@ defmodule Universa.MixProject do
   def application do
     [
       mod: {Universa, []},
-      extra_applications: [:logger, :sqlite_ecto2, :ecto, :yaml_elixir]
+      extra_applications: [:logger, :sqlite_ecto2, :ecto, :yaml_elixir, :ssl]
     ]
   end
 

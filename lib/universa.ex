@@ -8,6 +8,7 @@ defmodule Universa do
       Universa.Repo,
       Universa.SystemAgent,
       Universa.TcpServer,
+      #Universa.SSLServer,
       {DynamicSupervisor, name: Universa.TerminalSupervisor, strategy: :one_for_one},
       {Task.Supervisor, name: Universa.EventSupervisor}
     ]

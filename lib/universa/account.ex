@@ -24,7 +24,6 @@ defmodule Universa.Account do
         Argon2.no_user_verify()
         {:error, :username}
       user -> 
-        IO.inspect {password, user.password}
         case Argon2.verify_pass(password, user.password) do
           true -> {:ok, user.entity}
           false -> {:error, :password}

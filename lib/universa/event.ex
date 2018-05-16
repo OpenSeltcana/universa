@@ -1,11 +1,15 @@
 defmodule Universa.Event do
   defstruct source: nil, target: nil, type: nil, data: %{}
 
+  alias Universa.Event
+  alias Universa.EventSupervisor
+  alias Universa.SystemAgent
+
   # For each event, start a Task under Universa.EventSupervisor running run/1
-  def emit(%Universa.Event{} = event) do
+  def emit(%Event{} = event) do
     Task.Supervisor.async_nolink(
-      Universa.EventSupervisor,
-      Universa.Event,
+      EventSupervisor,
+      Event,
       :run,
       [event]
     )
@@ -21,7 +25,7 @@ defmodule Universa.Event do
   # Take our event, get a list of all systems registered to our event type,
   # then run every single one of them with our event
   def run(event) do
-    case Universa.SystemAgent.systems(event.type) do
+    case SystemAgent.systems(event.type) do
       {:ok, systems} ->
         Enum.each(systems, fn {order, system} ->
           apply(system, :event, [order, event.type, event])

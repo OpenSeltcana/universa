@@ -1,5 +1,7 @@
-defmodule Filter.MCCP do
-  use Universa.Filter
+defmodule Universa.Filter.MCCP do
+  alias Universa.Filter
+  
+  use Filter
 
   def get(packet, _state), do: {packet, []}
 
@@ -10,7 +12,7 @@ defmodule Filter.MCCP do
   end
 
   # Else just return the packet as-is
-  def put(packet, state) do
+  def put(packet, _state) do
     {packet, []}
   end
 end

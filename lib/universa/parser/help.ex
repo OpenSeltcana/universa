@@ -1,7 +1,8 @@
-defmodule Parser.Help do
-  use Universa.Parser
-
+defmodule Universa.Parser.Help do
   alias Universa.Event
+  alias Universa.Parser
+
+  use Parser
 
   def parse("help", entity) do
     events = [

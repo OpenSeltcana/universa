@@ -1,4 +1,4 @@
-defmodule System.Telnet.Naws do
+defmodule Universa.System.Telnet.NAWS do
   @moduledoc """
   Handles events related to the Negotiate About Window Size telnet command.
 
@@ -9,13 +9,14 @@ defmodule System.Telnet.Naws do
   under the key :telnet_naws
   """
   
+  alias Universa.Event
+  alias Universa.System
+  alias Universa.Terminal
 
-  use Universa.System
+  use System
 
   # For shifting things 8 bits
   use Bitwise
-
-  alias Universa.Event
 
   # Tell the client to do Native Window Size updates!
   event 50, :telnet, %Event{
@@ -32,7 +33,7 @@ defmodule System.Telnet.Naws do
         to: terminal
       }
     }
-    |> Universa.Event.emit
+    |> Event.emit
   end
 
   # When receiving an update of the client's window size
@@ -43,6 +44,6 @@ defmodule System.Telnet.Naws do
       }
     } do
     # Store it in the terminal
-    Universa.Terminal.set(terminal, :telnet_naws, {(w1 <<< 8) + w0, (h1 <<< 8) + h0})
+    Terminal.set(terminal, :telnet_naws, {(w1 <<< 8) + w0, (h1 <<< 8) + h0})
   end
 end

@@ -2,11 +2,13 @@ defmodule Universa.System do
   @callback events() :: [String.t]
   @callback event(number, atom, any) :: :ok | :error
 
+  alias Universa.System
+
   defmacro __using__(_options) do
     quote location: :keep do
-      import Universa.System
-      @behaviour Universa.System
-      @before_compile Universa.System
+      import System
+      @behaviour System
+      @before_compile System
       @events []
     end
   end

@@ -2,12 +2,13 @@ defmodule Universa.Parser do
   @callback parse(binary, map) :: {:stop | :keep_going, [map]}
 
   alias Universa.Entity
+  alias Universa.Parser
 
   defmacro __using__(_options) do
     quote location: :keep do
-      import Universa.Parser
-      @behaviour Universa.Parser
-      @before_compile Universa.Parser
+      import Parser
+      @behaviour Parser
+      @before_compile Parser
 
       def order, do: 50
 

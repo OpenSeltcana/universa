@@ -1,4 +1,4 @@
-defmodule Systems.Telnet.TerminalType do
+defmodule Universa.Systems.Telnet.TerminalType do
   @moduledoc """
   Handles events related to the Terminal-Type telnet command.
 
@@ -11,10 +11,12 @@ defmodule Systems.Telnet.TerminalType do
   The reply of the command is stored in the `Universa.Terminal` under the key
   :telnet_terminal_type
   """
-  
-  use Universa.System
 
   alias Universa.Event
+  alias Universa.System
+  alias Universa.Terminal
+  
+  use System
 
   # Tell the client to do terminal type!
   event 50, :telnet, %Event{
@@ -31,7 +33,7 @@ defmodule Systems.Telnet.TerminalType do
         to: terminal
       }
     }
-    |> Universa.Event.emit
+    |> Event.emit
   end
 
   # When client tells us it does terminal type
@@ -50,7 +52,7 @@ defmodule Systems.Telnet.TerminalType do
         to: terminal
       }
     }
-    |> Universa.Event.emit
+    |> Event.emit
   end
 
   # When receiving the client's terminal type
@@ -64,6 +66,6 @@ defmodule Systems.Telnet.TerminalType do
     terminal_type = Enum.take(client, length(client)-2)
 
     # Store it in the terminal
-    Universa.Terminal.set(terminal, :telnet_terminal_type, terminal_type)
+    Terminal.set(terminal, :telnet_terminal_type, terminal_type)
   end
 end

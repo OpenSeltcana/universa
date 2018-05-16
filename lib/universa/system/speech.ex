@@ -1,7 +1,8 @@
-defmodule Universa.Speech do
-  use Universa.System
-
+defmodule Universa.System.Speech do
   alias Universa.Event
+  alias Universa.System
+
+  use System
 
   event 50, :speech, %Event{
       source: source,

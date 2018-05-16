@@ -1,6 +1,8 @@
 defmodule Universa.SystemAgent do
   use Agent
 
+  alias Universa.System
+
   def start_link(_opts) do
     Agent.start_link(fn -> all_systems() end, name: __MODULE__)
   end
@@ -22,7 +24,7 @@ defmodule Universa.SystemAgent do
       |> Enum.filter(fn module ->
         module.module_info[:attributes]
         |> Keyword.get(:behaviour, [])
-        |> Enum.member?(Universa.System)
+        |> Enum.member?(System)
       end)
     end
     # Add an entry for every event this system handles in the format of {event, system}

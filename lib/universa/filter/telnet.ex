@@ -1,7 +1,8 @@
-defmodule Filter.Telnet do
-  use Universa.Filter
-
+defmodule Universa.Filter.Telnet do
+  alias Universa.Filter
   alias Universa.Event
+
+  use Filter
 
   def get(packet, state) do
     {text, telnet} = filter_telnet(packet)

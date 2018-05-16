@@ -1,14 +1,15 @@
-defmodule Parser.OOC do
-  use Universa.Parser
-
+defmodule Universa.Parser.OOC do
   alias Universa.Event
+  alias Universa.Parser
+
+  use Parser
 
   def parse("ooc " <> message, entity) do
     events = [
       %Event{
         type: :broadcast,
         data: %{
-          target: "players",
+          target: "online_players",
           event: %Event{
             type: :terminal,
             source: entity.uuid,

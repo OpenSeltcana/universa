@@ -1,7 +1,8 @@
-defmodule Parser.Say do
-  use Universa.Parser
-
+defmodule Universa.Parser.Say do
+  alias Universa.Parser
   alias Universa.Event
+  
+  use Parser
 
   def parse("say " <> message, entity) do
     events = [

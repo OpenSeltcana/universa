@@ -4,9 +4,11 @@ defmodule Universa.Shell do
   @callback output(map, map) :: {list, map}
   @callback on_unload(map) :: {[map], map}
 
+  alias Universa.Shell
+
   defmacro __using__(_options) do
     quote location: :keep do
-      @behaviour Universa.Shell
+      @behaviour Shell
     end
   end
 end

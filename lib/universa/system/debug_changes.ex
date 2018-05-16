@@ -1,5 +1,7 @@
-defmodule System.Debug do
-  use Universa.System
+defmodule Universa.System.Debug do
+  alias Universa.System
+
+  use System
 
   event 0, :component, data do
     IO.inspect data

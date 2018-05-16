@@ -1,6 +1,9 @@
 defmodule Universa.SSLServer do
   use Task, restart: :permanent
 
+  alias Universa.TerminalSupervisor
+  alias Universa.Terminal
+  alias Universa.SSLServer
   alias :ssl, as: SSL
 
   # Start a task that runs forever for the server port
@@ -34,13 +37,13 @@ defmodule Universa.SSLServer do
     :ok = SSL.ssl_accept(client)
 
     # Create a Terminal with default filters and shell
-    {:ok, pid} = DynamicSupervisor.start_child(Universa.TerminalSupervisor, 
+    {:ok, pid} = DynamicSupervisor.start_child(TerminalSupervisor, 
       {
-        Universa.Terminal, 
+        Terminal, 
         [
           socket: client, 
-          filters: [Filter.MCCP, Filter.Telnet, Filter.Ascii], 
-          shell: Shell.Authentication,
+          filters: [Universa.Filter.MCCP, Universa.Filter.Telnet, Universa.Filter.Ascii], 
+          shell: Universa.Shell.Authentication,
           ssl: true
         ]
       }
@@ -50,6 +53,6 @@ defmodule Universa.SSLServer do
     :ok = SSL.controlling_process(client, pid)
 
     # Full module name so it automatically uses a newer version if available
-    Universa.SSLServer.loop_accept socket
+    SSLServer.loop_accept socket
   end
 end

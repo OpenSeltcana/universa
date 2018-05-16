@@ -1,4 +1,4 @@
-defmodule System.Telnet.MSSP do
+defmodule Universa.System.Telnet.MSSP do
   @moduledoc """
   Handles events related to the Mud Server Status Protocol telnet command.
 
@@ -7,9 +7,12 @@ defmodule System.Telnet.MSSP do
   Specification is at: http://tintin.sourceforge.net/mssp/
   """
 
-  use Universa.System
-
   alias Universa.Event
+  alias Universa.System
+  alias Universa.Channel
+  alias :application, as: Application
+
+  use System
 
   # When telnet is started, notify we support MSSP!
   event 50, :telnet, %Event{
@@ -37,7 +40,7 @@ defmodule System.Telnet.MSSP do
       }
     } do
     # Collect information
-    {:ok, version} = :application.get_key(:universa, :vsn)
+    {:ok, version} = Application.get_key(:universa, :vsn)
     # Send up to date information
     %Event{
       type: :terminal,
@@ -52,7 +55,7 @@ defmodule System.Telnet.MSSP do
           "FAMILY" => "Custom",
           "ANSI" => 1,
           "MCCP" => 1,
-          "PLAYERS" => length(Universa.Channel.get("players")),
+          "PLAYERS" => length(Channel.get("players")),
           "UPTIME" => -1 # TODO: Figure out where to keep track of this
         }
       }

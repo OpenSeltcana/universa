@@ -1,7 +1,8 @@
-defmodule System.Terminal.ChangeSHell do
-  use Universa.System
-
+defmodule Universa.System.Terminal.ChangeShell do
   alias Universa.Event
+  alias Universa.System
+
+  use System
 
   # Change Terminal's shell at request
   event 99, :terminal, %Event{

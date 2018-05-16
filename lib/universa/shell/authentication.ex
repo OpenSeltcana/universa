@@ -1,8 +1,10 @@
-defmodule Shell.Authentication do
-  use Universa.Shell
-
+defmodule Universa.Shell.Authentication do
+  alias Universa.Shell
   alias Universa.Event
   alias Universa.Account
+  alias Universa.Template
+
+  use Shell
 
   # When this shell is loaded ask for telnet features and send a welcome message
   def on_load(%{terminal: terminal}) do
@@ -136,7 +138,7 @@ defmodule Shell.Authentication do
       %{shell_state: state}
     ) do
     metadata = Map.get(event.data, :metadata, [])
-    {:ok, msg} = Universa.Template.fill(template, metadata)
+    {:ok, msg} = Template.fill(template, metadata)
 
     {msg, state}
   end

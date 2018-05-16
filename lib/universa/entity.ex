@@ -74,6 +74,11 @@ defmodule Universa.Entity do
         end
       end)
     end
+
+    Component.create(entity, "loaded_from_file", %{
+      file: full_path,
+      unix_timestamp: DateTime.utc_now |> DateTime.to_unix
+    })
   end
 
   def dump(entity) do

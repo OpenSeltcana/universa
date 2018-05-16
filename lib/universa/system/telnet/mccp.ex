@@ -1,4 +1,4 @@
-defmodule System.Telnet.MCCP do
+defmodule Universa.System.Telnet.MCCP do
   @moduledoc """
   Handles events related to the Mud Client Compression Protocol telnet command.
 
@@ -7,9 +7,12 @@ defmodule System.Telnet.MCCP do
   Specification is at: http://tintin.sourceforge.net/mccp/
   """
 
-  use Universa.System
-
+  alias Universa.System
   alias Universa.Event
+  alias Universa.Terminal
+  alias :zlib, as: ZLib
+
+  use System
 
   # Tell the client we support MCCP!
   event 50, :telnet, %Event{
@@ -37,10 +40,10 @@ defmodule System.Telnet.MCCP do
       }
     } do
 
-    zlib = :zlib.open()
-    :zlib.deflateInit(zlib, 4)
-    :zlib.set_controlling_process(zlib, terminal)
-    Universa.Terminal.set(terminal, :telnet_mccp_compressor, zlib)
+    zlib = ZLib.open()
+    ZLib.deflateInit(zlib, 4)
+    ZLib.set_controlling_process(zlib, terminal)
+    Terminal.set(terminal, :telnet_mccp_compressor, zlib)
 
     # Send confirmation
     task = %Event{
@@ -53,7 +56,7 @@ defmodule System.Telnet.MCCP do
     }
     |> Event.emit
     Task.await(task)
-    Universa.Terminal.set(terminal, :telnet_mccp, true)
+    Terminal.set(terminal, :telnet_mccp, true)
   end
 
   # When asked to stop compressing
@@ -63,14 +66,14 @@ defmodule System.Telnet.MCCP do
         from: terminal
       }
     } do
-    Universa.Terminal.set(terminal, :telnet_mccp, false)
+    Terminal.set(terminal, :telnet_mccp, false)
 
-    case Universa.Terminal.get(terminal, :telnet_mccp_compressor) do
+    case Terminal.get(terminal, :telnet_mccp_compressor) do
       {:ok, zlib} ->
-        Universa.Terminal.set(terminal, :telnet_mccp_compressor, nil)
-        :zlib.set_controlling_process(zlib, self())
-        :zlib.deflateEnd(zlib)
-        :zlib.close(zlib)
+        Terminal.set(terminal, :telnet_mccp_compressor, nil)
+        ZLib.set_controlling_process(zlib, self())
+        ZLib.deflateEnd(zlib)
+        ZLib.close(zlib)
       _ -> :ok
     end
   end

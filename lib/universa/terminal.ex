@@ -2,6 +2,8 @@ defmodule Universa.Terminal do
   use GenServer
 
   alias Universa.Event
+  alias :gen_tcp, as: TCP
+  alias :ssl, as: SSL
 
   def start_link([socket: socket, filters: filters, shell: shell, ssl: ssl]), 
     do: GenServer.start_link(__MODULE__, %{socket: socket, filters: filters, shell: shell, ssl: ssl})
@@ -53,13 +55,13 @@ defmodule Universa.Terminal do
   def handle_cast({:change_shell, shell_new}, %{shell: shell_old} = state_old) do
     {old_events, shel_state_transition} = apply(shell_old, :on_unload, [state_old])
 
-    Universa.Event.emit(old_events)
+    Event.emit(old_events)
 
     {new_events, shell_state_new} = apply(shell_new, :on_load, [
       %{state_old | shell_state: shel_state_transition}
     ])
 
-    Universa.Event.emit(new_events)
+    Event.emit(new_events)
 
     {:noreply, %{state_old | shell: shell_new, shell_state: shell_state_new}}
   end
@@ -70,9 +72,9 @@ defmodule Universa.Terminal do
     {unfiltered_msg, unfilter_events} = run_filters(packet, [], :put, state, Enum.reverse(filters))
 
     if ssl do
-      :ssl.send(socket, unfiltered_msg)
+      SSL.send(socket, unfiltered_msg)
     else
-      :gen_tcp.send(socket, unfiltered_msg)
+      TCP.send(socket, unfiltered_msg)
     end
 
     Event.emit(unfilter_events)

@@ -1,20 +1,15 @@
-defmodule Shell.Player do
-  use Universa.Shell
-
+defmodule Universa.Shell.Player do
+  alias Universa.Shell
   alias Universa.Event
+  alias Universa.Channel
+  alias Universa.Template
+  alias Universa.Parser
+  alias Universa.Entity
+
+  use Shell
 
   # PLACEHOLDER: Just send a creepy hi message, thats all
   def on_load(%{terminal: terminal, shell_state: %{step: :authenticated, username: username, uuid: uuid}} = state) do
-    # Create the terminal registry if it doesn't exist yet
-    if is_nil(Process.whereis(Universa.Registry.Terminal)) do
-      Supervisor.start_child(Universa.Supervisor, 
-        Supervisor.child_spec({
-          Registry,
-          keys: :unique,
-          name: Universa.Registry.Terminal
-        }, id: :registry_terminal)
-      )
-    end
 
     {w, h} = Map.get(state, :telnet_naws, {0, 0})
     terminal_type = Map.get(state, :telnet_terminal_type, "UNKNOWN")
@@ -35,7 +30,9 @@ defmodule Shell.Player do
         }
       }
     ]
-    
+
+    Channel.add("online_players", uuid)
+
     # Use custom registry, because we cant store PIDs in ecto in a safe way.
     {:ok, _} = Registry.register(Universa.Registry.Terminal, uuid, nil)
 
@@ -49,12 +46,12 @@ defmodule Shell.Player do
 
   # Player typed something
   def input(packet, %{terminal: terminal, shell_state: %{uuid: uuid} = state}) do
-    ent = Universa.Entity.uuid(uuid)
+    ent = Entity.uuid(uuid)
 
     parsers = ent
-    |> Universa.Entity.component("parser")
+    |> Entity.component("parser")
 
-    case Universa.Parser.each("#{packet}", ent, parsers.value["list"]) do
+    case Parser.each("#{packet}", ent, parsers.value["list"]) do
       {:stop, events} -> {events, state}
       {:keep_going, events} -> 
         {
@@ -86,8 +83,8 @@ defmodule Shell.Player do
     ) do
     metadata = Map.get(event.data, :metadata, %{})
 
-    {:ok, msg} = Universa.Template.fill(template, metadata)
-    {:ok, prompt_msg} = Universa.Template.fill("player/prompt.eex", %{msg: msg})
+    {:ok, msg} = Template.fill(template, metadata)
+    {:ok, prompt_msg} = Template.fill("player/prompt.eex", %{msg: msg})
 
     {prompt_msg, state}
   end
@@ -100,12 +97,9 @@ defmodule Shell.Player do
 
   # Destroy our entity after we go squish
   def on_unload(%{shell_state: %{uuid: uuid} = state}) do
-    Universa.Entity.uuid(uuid)
-    |> Universa.Entity.destroy
-
     Registry.unregister(Universa.Registry.Terminal, uuid)
 
-    Universa.Channel.remove("players", uuid)
+    Channel.remove("online_players", uuid)
 
     {[], state}
   end

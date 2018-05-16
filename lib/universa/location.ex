@@ -6,6 +6,7 @@ defmodule Universa.Location do
   alias Universa.Repo
   alias Universa.Location
   alias Universa.Entity
+  alias Universa.Channel
 
   schema "locations" do
     field :location, :string
@@ -16,6 +17,8 @@ defmodule Universa.Location do
     {:ok, ent} = Entity.create
 
     Entity.load_from_file(ent, "location/#{location}")
+
+    Channel.add("locations", ent.uuid)
 
     %Location{location: location, uuid: ent.uuid} |> Repo.insert
   end

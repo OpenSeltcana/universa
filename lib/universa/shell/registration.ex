@@ -1,7 +1,13 @@
-defmodule Shell.Registration do
-  use Universa.Shell
-
+defmodule Universa.Shell.Registration do
   alias Universa.Event
+  alias Universa.Account
+  alias Universa.Component
+  alias Universa.Channel
+  alias Universa.Template
+  alias Universa.Entity
+  alias Universa.Shell
+
+  use Shell
 
   # PLACEHOLDER: Just send people to the PlayerShell
   def on_load(%{terminal: terminal, shell_state: %{step: :registration}}) do
@@ -104,21 +110,23 @@ defmodule Shell.Registration do
   def input(packet, %{terminal: terminal, shell_state: %{step: :confirm_password, username: username, password: password} = state}) do
     case packet == password do
       true ->
-        {:ok, ent} = Universa.Entity.create
+        {:ok, ent} = Entity.create
 
-        Universa.Account.create(username, "#{password}", ent.uuid)
+        Account.create(username, "#{password}", ent.uuid)
 
-        Universa.Component.create(ent, "name", %{value: "New Person (#{username})"})
-        Universa.Component.create(ent, "location", %{value: "start"})
+        Component.create(ent, "name", %{value: "New Person (#{username})"})
+        Component.create(ent, "location", %{value: "start"})
 
         # Add a list of default parsers for now
-        Universa.Component.create(ent, "parser", %{
+        Component.create(ent, "parser", %{
           list: [
-            [50, Parser.Help],
-            [50, Parser.Say],
-            [50, Parser.OOC]
+            [50, Universa.Parser.Help],
+            [50, Universa.Parser.Say],
+            [50, Universa.Parser.OOC]
           ]
         })
+
+        Channel.add("players", ent.uuid)
 
         events = [
           %Event{
@@ -176,7 +184,7 @@ defmodule Shell.Registration do
       %{shell_state: state}
     ) do
     metadata = Map.get(event.data, :metadata, [])
-    {:ok, msg} = Universa.Template.fill(template, metadata)
+    {:ok, msg} = Template.fill(template, metadata)
 
     {msg, state}
   end

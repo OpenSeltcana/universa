@@ -1,7 +1,12 @@
-defmodule System.Location do
-  use Universa.System
-
+defmodule Universa.System.Location do
   alias Universa.Event
+  alias Universa.System
+  alias Universa.Location
+  alias Universa.Component
+  alias Universa.Channel
+  alias Universa.Entity
+
+  use System
 
   # If location is a string instead of a uuid, update it to a uuid
   event 50, :component, %Event{
@@ -16,14 +21,14 @@ defmodule System.Location do
     } do
 
     if not is_uuid(location) do
-      location_uuid = Universa.Location.get(location)
+      location_uuid = Location.get(location)
 
-      component = Universa.Entity.component(entity, "location")
-      Universa.Component.update(component, %{value: location_uuid})
+      component = Entity.component(entity, "location")
+      Component.update(component, %{value: location_uuid})
 
-      Universa.Channel.add(location_uuid, entity)
+      Channel.add(location_uuid, entity)
     else
-      Universa.Channel.add(location, entity)
+      Channel.add(location, entity)
     end
   end
 
@@ -43,18 +48,18 @@ defmodule System.Location do
     } do
 
     if is_uuid(old_location) do
-      Universa.Channel.remove(old_location, entity)
+      Channel.remove(old_location, entity)
     end
 
     if not is_uuid(new_location) do
-      location_uuid = Universa.Location.get(new_location)
+      location_uuid = Location.get(new_location)
 
-      component = Universa.Entity.component(entity, "location")
-      Universa.Component.update(component, %{value: location_uuid})
+      component = Entity.component(entity, "location")
+      Component.update(component, %{value: location_uuid})
 
-      Universa.Channel.add(location_uuid, entity)
+      Channel.add(location_uuid, entity)
     else
-      Universa.Channel.add(new_location, entity)
+      Channel.add(new_location, entity)
     end
   end
 

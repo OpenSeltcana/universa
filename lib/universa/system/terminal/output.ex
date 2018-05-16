@@ -1,7 +1,8 @@
-defmodule System.Terminal.Output do
-  use Universa.System
-
+defmodule Universa.System.Terminal.Output do
   alias Universa.Event
+  alias Universa.System
+
+  use System
 
   # Send terminal output events directly to the terminal
   event 99, :terminal, %Event{data: %{type: :output, to: terminal}} = event do

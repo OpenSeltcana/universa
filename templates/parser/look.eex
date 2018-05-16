@@ -1,0 +1,5 @@
+
+<%= t.fg.bgreen %><%= data.name %><%= t.fg.reset %>
+
+We don't do descriptions yet!
+<%= data.contents %>

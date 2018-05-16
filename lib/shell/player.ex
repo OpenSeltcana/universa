@@ -4,7 +4,7 @@ defmodule Shell.Player do
   alias Universa.Event
 
   # PLACEHOLDER: Just send a creepy hi message, thats all
-  def on_load(%{terminal: terminal, shell_state: %{step: :authenticated, username: username}} = state) do
+  def on_load(%{terminal: terminal, shell_state: %{step: :authenticated, username: username, uuid: uuid}} = state) do
     # Create the terminal registry if it doesn't exist yet
     if is_nil(Process.whereis(Universa.Registry.Terminal)) do
       Supervisor.start_child(Universa.Supervisor, 
@@ -35,30 +35,14 @@ defmodule Shell.Player do
         }
       }
     ]
-
-    {:ok, ent} = Universa.Entity.create
-
-    Universa.Component.create(ent, "name", %{value: "New Person (#{username})"})
-    Universa.Component.create(ent, "location", %{value: "start"})
-
-    Universa.Channel.add("players", ent.uuid)
-
+    
     # Use custom registry, because we cant store PIDs in ecto in a safe way.
-    {:ok, _} = Registry.register(Universa.Registry.Terminal, ent.uuid, nil)
-
-    # Add a list of default parsers for now
-    Universa.Component.create(ent, "parser", %{
-      list: [
-        [50, Parser.Help],
-        [50, Parser.Say],
-        [50, Parser.OOC]
-      ]
-    })
+    {:ok, _} = Registry.register(Universa.Registry.Terminal, uuid, nil)
 
     {
       events,
       %{
-        uuid: ent.uuid
+        uuid: uuid
       }
     }
   end

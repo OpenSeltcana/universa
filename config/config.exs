@@ -8,6 +8,7 @@ config :universa, Universa.Repo,
 
 config :universa, ecto_repos: [Universa.Repo]
 
+config :argon2_elixir, t_cost: 3, m_cost: 14
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

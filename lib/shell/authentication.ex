@@ -2,6 +2,7 @@ defmodule Shell.Authentication do
   use Universa.Shell
 
   alias Universa.Event
+  alias Universa.Account
 
   # When this shell is loaded ask for telnet features and send a welcome message
   def on_load(%{terminal: terminal}) do
@@ -28,7 +29,8 @@ defmodule Shell.Authentication do
       events,
       %{
         step: :username,
-        username: ""
+        username: "",
+        uuid: ""
       }
     }
   end
@@ -75,10 +77,9 @@ defmodule Shell.Authentication do
   end
 
   # When we receive text and we are at the password step (second)
-  def input(packet, %{terminal: terminal, shell_state: %{step: :password} = state}) do
-    # TODO: Actually check you know... the password
-    case true do
-      true ->
+  def input(packet, %{terminal: terminal, shell_state: %{step: :password, username: username} = state}) do
+    case Account.login(username, "#{packet}") do
+      {:ok, uuid} ->
         events = [
           %Event{
             type: :terminal,
@@ -106,7 +107,20 @@ defmodule Shell.Authentication do
           }
         ]
 
-        {events, %{state | step: :authenticated}}
+        {events, %{state | step: :authenticated, uuid: uuid}}
+      {:error, _} ->
+        events = [
+          %Event{
+            type: :terminal,
+            data: %{
+              type: :output,
+              template: "authentication/ask_password_again.eex",
+              to: terminal
+            }
+          }
+        ]
+
+        {events, state}
     end
   end
 

@@ -23,6 +23,7 @@ defmodule Universa.MixProject do
   defp deps do
     [
 #      {:distillery, "~> 1.5", runtime: false},
+      {:argon2_elixir, "~> 1.2"},
       {:yaml_elixir, "~> 2.0"},
       {:poison, "~> 3.1"}, # For converting maps to JSON
       {:ecto, "~> 2.2"}, # For interface with databases and UUID generation

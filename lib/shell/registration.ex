@@ -13,30 +13,156 @@ defmodule Shell.Registration do
           template: "registration/welcome.eex",
           to: terminal
         }
-      },
-      # Because we are a placeholder, send them straight towards PlayerShell
-      %Event{
-        type: :terminal,
-        data: %{
-          type: :change_shell,
-          shell: Shell.Player,
-          to: terminal
-        }
       }
     ]
 
     {
       events,
-      # Deceive the next shell in thinking the player just logged in
       %{
-        username: "Guest",
-        step: :authenticated
+        step: :username,
+        username: "",
+        password: "",
+        uuid: nil
       }
     }
   end
 
-  # PLACEHOLDER: Do nothing when we receive a message from the player
-  def input(_packet, %{shell_state: state}), do: {[], state}
+  def input(packet, %{terminal: terminal, shell_state: %{step: :username} = state}) do
+    username = String.capitalize("#{packet}")
+
+    events = [
+      %Event{
+        type: :terminal,
+        data: %{
+          type: :output,
+          template: "registration/ask_username_confirmation.eex",
+          metadata: %{
+            username: username
+          },
+          to: terminal
+        }
+      }
+    ]
+
+    {events, %{state | step: :confirm_username, username: username}}
+  end
+
+  def input(packet, %{terminal: terminal, shell_state: %{step: :confirm_username} = state}) do
+    packet_lowered = String.downcase("#{packet}")
+    if packet_lowered == "yes" or packet_lowered == "y" do
+      events = [
+        %Event{
+          type: :terminal,
+          data: %{
+            type: :output,
+            template: "registration/ask_password.eex",
+            to: terminal
+          }
+        },
+        %Event{
+          type: :terminal,
+          data: %{
+            type: :output,
+            template: "telnet/will_echo.eex",
+            to: terminal
+          }
+        }
+      ]
+
+      {events, %{state | step: :password, password: packet}}
+    else
+      events = [
+        %Event{
+          type: :terminal,
+          data: %{
+            type: :output,
+            template: "registration/ask_username_again.eex",
+            to: terminal
+          }
+        }
+      ]
+
+      {events, %{state | step: :username}}
+    end
+  end
+
+  def input(packet, %{terminal: terminal, shell_state: %{step: :password} = state}) do
+    events = [
+      %Event{
+        type: :terminal,
+        data: %{
+          type: :output,
+          template: "registration/ask_password_confirmation.eex",
+          to: terminal
+        }
+      }
+    ]
+
+    {events, %{state | step: :confirm_password, password: packet}}
+  end
+
+  def input(packet, %{terminal: terminal, shell_state: %{step: :confirm_password, username: username, password: password} = state}) do
+    case packet == password do
+      true ->
+        {:ok, ent} = Universa.Entity.create
+
+        Universa.Account.create(username, "#{password}", ent.uuid)
+
+        Universa.Component.create(ent, "name", %{value: "New Person (#{username})"})
+        Universa.Component.create(ent, "location", %{value: "start"})
+
+        # Add a list of default parsers for now
+        Universa.Component.create(ent, "parser", %{
+          list: [
+            [50, Parser.Help],
+            [50, Parser.Say],
+            [50, Parser.OOC]
+          ]
+        })
+
+        events = [
+          %Event{
+            type: :terminal,
+            data: %{
+              type: :output,
+              template: "registration/complete.eex",
+              to: terminal
+            }
+          },
+          %Event{
+            type: :terminal,
+            data: %{
+              type: :output,
+              template: "telnet/wont_echo.eex",
+              to: terminal
+            }
+          },
+          %Event{
+            type: :terminal,
+            data: %{
+              type: :change_shell,
+              shell: Shell.Player,
+              to: terminal
+            }
+          }
+        ]
+
+        {events, %{state | step: :authenticated, uuid: ent.uuid}}
+      false ->
+        events = [
+          %Event{
+            type: :terminal,
+            data: %{
+              type: :output,
+              template: "registration/ask_password_again.eex",
+              to: terminal
+            }
+          }
+        ]
+
+        {events, %{state | step: :password}}
+    end
+  end
 
   # All incoming messsages from the game are templates that get filled in
   def output(

@@ -122,8 +122,7 @@ defmodule Universa.Shell.Registration do
           list: [
             [50, Universa.Parser.Help],
             [50, Universa.Parser.Say],
-            [50, Universa.Parser.OOC],
-            [50, Universa.Parser.Look]
+            [50, Universa.Parser.OOC]
           ]
         })
 

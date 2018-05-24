@@ -55,6 +55,7 @@ defmodule Universa.Shell.Registration do
 
   def input(packet, %{terminal: terminal, shell_state: %{step: :confirm_username} = state}) do
     packet_lowered = String.downcase("#{packet}")
+
     if packet_lowered == "yes" or packet_lowered == "y" do
       events = [
         %Event{
@@ -107,10 +108,13 @@ defmodule Universa.Shell.Registration do
     {events, %{state | step: :confirm_password, password: packet}}
   end
 
-  def input(packet, %{terminal: terminal, shell_state: %{step: :confirm_password, username: username, password: password} = state}) do
+  def input(packet, %{
+        terminal: terminal,
+        shell_state: %{step: :confirm_password, username: username, password: password} = state
+      }) do
     case packet == password do
       true ->
-        {:ok, ent} = Entity.create
+        {:ok, ent} = Entity.create()
 
         Account.create(username, "#{password}", ent.uuid)
 
@@ -122,7 +126,8 @@ defmodule Universa.Shell.Registration do
           list: [
             [50, Universa.Parser.Help],
             [50, Universa.Parser.Say],
-            [50, Universa.Parser.OOC]
+            [50, Universa.Parser.OOC],
+            [50, Universa.Parser.Look]
           ]
         })
 
@@ -156,6 +161,7 @@ defmodule Universa.Shell.Registration do
         ]
 
         {events, %{state | step: :authenticated, uuid: ent.uuid}}
+
       false ->
         events = [
           %Event{
@@ -174,15 +180,15 @@ defmodule Universa.Shell.Registration do
 
   # All incoming messsages from the game are templates that get filled in
   def output(
-      %Event{
-        type: :terminal,
-        data: %{
-          type: :output,
-          template: template
-        }
-      } = event, 
-      %{shell_state: state}
-    ) do
+        %Event{
+          type: :terminal,
+          data: %{
+            type: :output,
+            template: template
+          }
+        } = event,
+        %{shell_state: state}
+      ) do
     metadata = Map.get(event.data, :metadata, [])
     {:ok, msg} = Template.fill(template, metadata)
 
@@ -191,7 +197,7 @@ defmodule Universa.Shell.Registration do
 
   # If we receive anthing other than template requests... Whine about it!
   def output(_, %{shell_state: state}) do
-    IO.write "We received spam, truly!?"
+    IO.write("We received spam, truly!?")
     {"", state}
   end
 

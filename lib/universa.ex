@@ -16,7 +16,7 @@ defmodule Universa do
       Repo,
       SystemAgent,
       TcpServer,
-      #SSLServer,
+      # SSLServer,
       {DynamicSupervisor, name: TerminalSupervisor, strategy: :one_for_one},
       {Task.Supervisor, name: EventSupervisor}
     ]
@@ -24,12 +24,16 @@ defmodule Universa do
     opts = [strategy: :one_for_one, name: Universa.Supervisor]
     result = Supervisor.start_link(children, opts)
 
-    %Event{
-      type: :server,
-      data: %{
-        type: :start
+    {:ok, task} =
+      %Event{
+        type: :server,
+        data: %{
+          type: :start
+        }
       }
-    } |> Event.emit
+      |> Event.emit()
+
+    Task.await(task)
 
     result
   end

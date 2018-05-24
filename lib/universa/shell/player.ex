@@ -9,8 +9,12 @@ defmodule Universa.Shell.Player do
   use Shell
 
   # PLACEHOLDER: Just send a creepy hi message, thats all
-  def on_load(%{terminal: terminal, shell_state: %{step: :authenticated, username: username, uuid: uuid}} = state) do
-
+  def on_load(
+        %{
+          terminal: terminal,
+          shell_state: %{step: :authenticated, username: username, uuid: uuid}
+        } = state
+      ) do
     {w, h} = Map.get(state, :telnet_naws, {0, 0})
     terminal_type = Map.get(state, :telnet_terminal_type, "UNKNOWN")
 
@@ -48,23 +52,27 @@ defmodule Universa.Shell.Player do
   def input(packet, %{terminal: terminal, shell_state: %{uuid: uuid} = state}) do
     ent = Entity.uuid(uuid)
 
-    parsers = ent
-    |> Entity.component("parser")
+    parsers =
+      ent
+      |> Entity.component("parser")
 
     case Parser.each("#{packet}", ent, parsers.value["list"]) do
-      {:stop, events} -> {events, state}
-      {:keep_going, events} -> 
+      {:stop, events} ->
+        {events, state}
+
+      {:keep_going, events} ->
         {
-          events ++ [
-            %Event{
-              type: :terminal,
-              data: %{
-                type: :output,
-                template: "parser/not_found.eex",
-                to: terminal
+          events ++
+            [
+              %Event{
+                type: :terminal,
+                data: %{
+                  type: :output,
+                  template: "parser/not_found.eex",
+                  to: terminal
+                }
               }
-            }
-          ],
+            ],
           state
         }
     end
@@ -72,15 +80,15 @@ defmodule Universa.Shell.Player do
 
   # All incoming messsages from the game are templates that get filled in
   def output(
-      %Event{
-        type: :terminal,
-        data: %{
-          type: :output,
-          template: template
-        }
-      } = event, 
-      %{shell_state: state}
-    ) do
+        %Event{
+          type: :terminal,
+          data: %{
+            type: :output,
+            template: template
+          }
+        } = event,
+        %{shell_state: state}
+      ) do
     metadata = Map.get(event.data, :metadata, %{})
 
     {:ok, msg} = Template.fill(template, metadata)
@@ -91,7 +99,7 @@ defmodule Universa.Shell.Player do
 
   # If we receive anthing other than template requests... Whine about it!
   def output(_, %{shell_state: state}) do
-    IO.write "We received spam, truly!?"
+    IO.write("We received spam, truly!?")
     {"", state}
   end
 

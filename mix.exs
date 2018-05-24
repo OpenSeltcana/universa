@@ -22,12 +22,16 @@ defmodule Universa.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-#      {:distillery, "~> 1.5", runtime: false},
+      # {:distillery, "~> 1.5", runtime: false},
+      {:dialyzex, "~> 1.1.0", only: :dev},
       {:argon2_elixir, "~> 1.2"},
       {:yaml_elixir, "~> 2.0"},
-      {:poison, "~> 3.1"}, # For converting maps to JSON
-      {:ecto, "~> 2.2"}, # For interface with databases and UUID generation
-      {:sqlite_ecto2, "~> 2.2"} # Adapter for ecto to connect to sqlite3 databases
+      # For converting maps to JSON
+      {:poison, "~> 3.1"},
+      # For interface with databases and UUID generation
+      {:ecto, "~> 2.2"},
+      # Adapter for ecto to connect to sqlite3 databases
+      {:sqlite_ecto2, "~> 2.2"}
     ]
   end
 end

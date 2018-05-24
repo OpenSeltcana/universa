@@ -5,8 +5,9 @@ defmodule Universa.Terminal do
   alias :gen_tcp, as: TCP
   alias :ssl, as: SSL
 
-  def start_link([socket: socket, filters: filters, shell: shell, ssl: ssl]), 
-    do: GenServer.start_link(__MODULE__, %{socket: socket, filters: filters, shell: shell, ssl: ssl})
+  def start_link(socket: socket, filters: filters, shell: shell, ssl: ssl),
+    do:
+      GenServer.start_link(__MODULE__, %{socket: socket, filters: filters, shell: shell, ssl: ssl})
 
   def init(%{socket: socket, filters: filters, shell: shell, ssl: ssl}) do
     state = %{
@@ -20,10 +21,10 @@ defmodule Universa.Terminal do
 
     {events, new_state} = apply(shell, :on_load, [state])
 
-    Enum.each(events, fn event -> Event.emit(event) end)
+    :ok = Event.emit_all(events)
 
     {:ok, %{state | shell_state: new_state}}
-  end 
+  end
 
   ## Client Functions
 
@@ -55,29 +56,34 @@ defmodule Universa.Terminal do
   def handle_cast({:change_shell, shell_new}, %{shell: shell_old} = state_old) do
     {old_events, shel_state_transition} = apply(shell_old, :on_unload, [state_old])
 
-    Event.emit(old_events)
+    :ok = Event.emit_all(old_events)
 
-    {new_events, shell_state_new} = apply(shell_new, :on_load, [
-      %{state_old | shell_state: shel_state_transition}
-    ])
+    {new_events, shell_state_new} =
+      apply(shell_new, :on_load, [
+        %{state_old | shell_state: shel_state_transition}
+      ])
 
-    Event.emit(new_events)
+    :ok = Event.emit_all(new_events)
 
     {:noreply, %{state_old | shell: shell_new, shell_state: shell_state_new}}
   end
 
   # Player received something
-  def handle_cast({:send, event}, %{filters: filters, shell: shell, socket: socket, ssl: ssl} = state) do
+  def handle_cast(
+        {:send, event},
+        %{filters: filters, shell: shell, socket: socket, ssl: ssl} = state
+      ) do
     {packet, new_state} = apply(shell, :output, [event, state])
-    {unfiltered_msg, unfilter_events} = run_filters(packet, [], :put, state, Enum.reverse(filters))
 
-    if ssl do
-      SSL.send(socket, unfiltered_msg)
-    else
-      TCP.send(socket, unfiltered_msg)
+    {unfiltered_msg, unfilter_events} =
+      run_filters(packet, [], :put, state, Enum.reverse(filters))
+
+    case ssl do
+      true -> SSL.send(socket, unfiltered_msg)
+      false -> TCP.send(socket, unfiltered_msg)
     end
 
-    Event.emit(unfilter_events)
+    :ok = Event.emit_all(unfilter_events)
 
     {:noreply, %{state | shell_state: new_state}}
   end
@@ -88,12 +94,12 @@ defmodule Universa.Terminal do
   def handle_info({:tcp, _socket, msg}, %{filters: filters, shell: shell} = state) do
     {filtered_msg, filter_events} = run_filters(msg, [], :get, state, filters)
 
-    Enum.each(filter_events, fn event -> Event.emit(event) end)
+    :ok = Event.emit_all(filter_events)
 
     if length(filtered_msg) > 0 do
       {events, new_state} = apply(shell, :input, [filtered_msg, state])
 
-      Event.emit(events)
+      :ok = Event.emit_all(events)
 
       {:noreply, %{state | shell_state: new_state}}
     else
@@ -107,13 +113,13 @@ defmodule Universa.Terminal do
   def handle_info({:tcp_closed, _socket}, %{shell: shell} = state) do
     {events, new_state} = apply(shell, :on_unload, [state])
 
-    Enum.each(events, fn event -> Event.emit(event) end)
+    :ok = Event.emit_all(events)
 
     {:stop, :normal, %{state | shell_state: new_state}}
   end
 
   # Don't crash when we receive other messages (Erlang likes to send those.)
-  def handle_info(msg, state), do: {:noreply, state}
+  def handle_info(_msg, state), do: {:noreply, state}
 
   defp run_filters(msg, events, _fun, _state, []), do: {msg, events}
 

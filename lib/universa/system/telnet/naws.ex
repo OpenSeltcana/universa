@@ -8,7 +8,7 @@ defmodule Universa.System.Telnet.NAWS do
   The updates of the client window size are stored in the `Universa.Terminal` 
   under the key :telnet_naws
   """
-  
+
   alias Universa.Event
   alias Universa.System
   alias Universa.Terminal
@@ -20,11 +20,11 @@ defmodule Universa.System.Telnet.NAWS do
 
   # Tell the client to do Native Window Size updates!
   event 50, :telnet, %Event{
-      data: %{
-        type: :start, 
-        from: terminal
-      }
-    } do
+    data: %{
+      type: :start,
+      from: terminal
+    }
+  } do
     %Event{
       type: :terminal,
       data: %{
@@ -33,16 +33,16 @@ defmodule Universa.System.Telnet.NAWS do
         to: terminal
       }
     }
-    |> Event.emit
+    |> Event.emit()
   end
 
   # When receiving an update of the client's window size
   event 50, :telnet, %Event{
-      data: %{
-        command: [255, 250, 31, w1, w0, h1, h0, 255, 240],
-        from: terminal
-      }
-    } do
+    data: %{
+      command: [255, 250, 31, w1, w0, h1, h0, 255, 240],
+      from: terminal
+    }
+  } do
     # Store it in the terminal
     Terminal.set(terminal, :telnet_naws, {(w1 <<< 8) + w0, (h1 <<< 8) + h0})
   end

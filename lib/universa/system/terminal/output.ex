@@ -15,10 +15,13 @@ defmodule Universa.System.Terminal.Output do
     # Can't do this in a guard because of the = event part
     if not is_nil(uuid) do
       case Registry.lookup(Universa.Registry.Terminal, uuid) do
-        [{terminal, nil}] -> # We found the terminal connected to that uuid
+        # We found the terminal connected to that uuid
+        [{terminal, nil}] ->
           GenServer.cast(terminal, {:send, event})
           :ok
-        [] -> # We did not find the terminal
+
+        # We did not find the terminal
+        [] ->
           :error
       end
     else

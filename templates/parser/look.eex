@@ -1,0 +1,3 @@
+<%= t.fg.bgreen %><%= data.name %><%= t.fg.reset %>
+
+<%= data.contents %>

@@ -16,11 +16,11 @@ defmodule Universa.System.Telnet.MCCP do
 
   # Tell the client we support MCCP!
   event 50, :telnet, %Event{
-      data: %{
-        type: :start, 
-        from: terminal
-      }
-    } do
+    data: %{
+      type: :start,
+      from: terminal
+    }
+  } do
     %Event{
       type: :terminal,
       data: %{
@@ -29,43 +29,44 @@ defmodule Universa.System.Telnet.MCCP do
         to: terminal
       }
     }
-    |> Event.emit
+    |> Event.emit()
   end
 
   # When asked to start compressing
   event 50, :telnet, %Event{
-      data: %{
-        command: [255, 253, 86],
-        from: terminal
-      }
-    } do
-
+    data: %{
+      command: [255, 253, 86],
+      from: terminal
+    }
+  } do
     zlib = ZLib.open()
     ZLib.deflateInit(zlib, 4)
     ZLib.set_controlling_process(zlib, terminal)
     Terminal.set(terminal, :telnet_mccp_compressor, zlib)
 
     # Send confirmation
-    task = %Event{
-      type: :terminal,
-      data: %{
-        type: :output,
-        template: "telnet/subnegotiate_mccp.eex",
-        to: terminal
+    GenServer.cast(terminal,
+     {:send, 
+      %Event{
+        type: :terminal,
+        data: %{
+          type: :output,
+          template: "telnet/subnegotiate_mccp.eex",
+          to: terminal
+        }
       }
-    }
-    |> Event.emit
-    Task.await(task)
+    })
+
     Terminal.set(terminal, :telnet_mccp, true)
   end
 
   # When asked to stop compressing
   event 50, :telnet, %Event{
-      data: %{
-        command: [255, 254, 86],
-        from: terminal
-      }
-    } do
+    data: %{
+      command: [255, 254, 86],
+      from: terminal
+    }
+  } do
     Terminal.set(terminal, :telnet_mccp, false)
 
     case Terminal.get(terminal, :telnet_mccp_compressor) do
@@ -74,7 +75,9 @@ defmodule Universa.System.Telnet.MCCP do
         ZLib.set_controlling_process(zlib, self())
         ZLib.deflateEnd(zlib)
         ZLib.close(zlib)
-      _ -> :ok
+
+      _ ->
+        :ok
     end
   end
 end

@@ -5,12 +5,12 @@ defmodule Universa.System.Speech do
   use System
 
   event 50, :speech, %Event{
-      source: source,
-      data: %{
-        message: message,
-        volume: _db
-      }
-    } do
+    source: source,
+    data: %{
+      message: message,
+      volume: _db
+    }
+  } do
     # TODO: Work out volumes and ranges and locations
     [
       %Event{
@@ -26,6 +26,7 @@ defmodule Universa.System.Speech do
           }
         }
       }
-    ] |> Event.emit
+    ]
+    |> Event.emit_all()
   end
 end

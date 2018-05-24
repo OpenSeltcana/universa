@@ -1,8 +1,7 @@
 defmodule Universa.Template do
-  @compile :nowarn_unused_vars
-
   require EEx
 
+  @spec fill(String.t(), map) :: {:ok, String.t()}
   def fill(file, data) do
     t = %{
       fg: %{
@@ -48,8 +47,8 @@ defmodule Universa.Template do
         continue_echo: "\xff\xfc\x01"
       }
     }
-    
+
     # TODO: Catch it when things try to run non-existing templates
-    {:ok, EEx.eval_file("templates/#{file}", [t: t, data: data])}
+    {:ok, EEx.eval_file("templates/#{file}", t: t, data: data)}
   end
 end

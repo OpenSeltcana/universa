@@ -1,5 +1,5 @@
 defmodule Universa.System do
-  @callback events() :: [String.t]
+  @callback events() :: list({number, atom})
   @callback event(number, atom, any) :: :ok | :error
 
   alias Universa.System
@@ -21,7 +21,7 @@ defmodule Universa.System do
     end
   end
 
-  defmacro event(order, type, data, [do: block]), do: parse_header(order, type, data, block)
+  defmacro event(order, type, data, do: block), do: parse_header(order, type, data, block)
 
   defp parse_header(order, type, data, block) do
     quote do

@@ -4,6 +4,8 @@ defmodule Universa.Parser do
   alias Universa.Entity
   alias Universa.Parser
 
+  require Logger
+
   defmacro __using__(_options) do
     quote location: :keep do
       import Parser
@@ -12,7 +14,7 @@ defmodule Universa.Parser do
 
       def order, do: 50
 
-      defoverridable [order: 0]
+      defoverridable order: 0
     end
   end
 
@@ -22,14 +24,22 @@ defmodule Universa.Parser do
     end
   end
 
+  @spec each(map, map, list({number, atom})) :: {:keep_going | :stop, list(map)}
   def each(message, %Entity{} = entity, []), do: {:keep_going, []}
 
   def each(message, %Entity{} = entity, [[_order, module] | others]) do
-    case apply(String.to_existing_atom(module), :parse, [message, entity]) do
-      {:keep_going, events} -> 
-        {msg, events_others} = each(message, entity, others)
-        {msg, events ++ events_others}
-      {:stop, events} -> {:stop, events}
+    try do
+      case apply(String.to_existing_atom(module), :parse, [message, entity]) do
+        {:keep_going, events} ->
+          {msg, events_others} = each(message, entity, others)
+          {msg, events ++ events_others}
+
+        {:stop, events} ->
+          {:stop, events}
+      end
+    rescue
+      error ->
+        Logger.error("Parser #{module}.parse/2 failed with:\n#{Exception.format(:error, error)}")
     end
   end
 end

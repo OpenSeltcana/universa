@@ -7,6 +7,7 @@ defmodule Universa.TcpServer do
   alias :gen_tcp, as: TCP
 
   # Start a task that runs forever for the server port
+  @spec start_link([]) :: {:ok, pid}
   def start_link([]) do
     {:ok, pid} = Task.start_link(__MODULE__, :listen, [])
     Process.register(pid, __MODULE__)
@@ -15,15 +16,19 @@ defmodule Universa.TcpServer do
 
   # Open the listening port
   def listen do
-    {:ok, socket} = TCP.listen(4000, [
-        packet: :line, 
-        active: true, # Send messages instead of blocking calls
-        reuseaddr: true, # To avoid issues when doing quick restarts
-        keepalive: true # Check periodically if the other side is still alive
-      ]
-    )
+    {:ok, socket} =
+      TCP.listen(
+        4000,
+        packet: :line,
+        # Send messages instead of blocking calls
+        active: true,
+        # To avoid issues when doing quick restarts
+        reuseaddr: true,
+        # Check periodically if the other side is still alive
+        keepalive: true
+      )
 
-    loop_accept socket
+    loop_accept(socket)
   end
 
   # This function loops forever, accepting connections endlessly
@@ -32,22 +37,21 @@ defmodule Universa.TcpServer do
     {:ok, client} = TCP.accept(socket)
 
     # Create a Terminal with default filters and shell
-    {:ok, pid} = DynamicSupervisor.start_child(TerminalSupervisor, 
-      {
-        Terminal, 
+    {:ok, pid} =
+      DynamicSupervisor.start_child(TerminalSupervisor, {
+        Terminal,
         [
-          socket: client, 
-          filters: [Universa.Filter.MCCP, Universa.Filter.Telnet, Universa.Filter.Ascii], 
+          socket: client,
+          filters: [Universa.Filter.MCCP, Universa.Filter.Telnet, Universa.Filter.Ascii],
           shell: Universa.Shell.Authentication,
           ssl: false
         ]
-      }
-    )
+      })
 
     # Hand ownership to the newly created Terminal, so it receives messages
     :ok = TCP.controlling_process(client, pid)
 
     # Full module name so it automatically uses a newer version if available
-    TcpServer.loop_accept socket
+    TcpServer.loop_accept(socket)
   end
 end

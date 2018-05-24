@@ -15,17 +15,21 @@ defmodule Universa.SSLServer do
 
   # Open the listening port
   def listen do
-    {:ok, socket} = SSL.listen(4001, [
+    {:ok, socket} =
+      SSL.listen(
+        4001,
         certfile: "certificate.pem",
         keyfile: "key.pem",
-        packet: :line, 
-        active: true, # Send messages instead of blocking calls
-        reuseaddr: true, # To avoid issues when doing quick restarts
-        keepalive: true # Check periodically if the other side is still alive
-      ]
-    )
+        packet: :line,
+        # Send messages instead of blocking calls
+        active: true,
+        # To avoid issues when doing quick restarts
+        reuseaddr: true,
+        # Check periodically if the other side is still alive
+        keepalive: true
+      )
 
-    loop_accept socket
+    loop_accept(socket)
   end
 
   # This function loops forever, accepting connections endlessly
@@ -37,22 +41,21 @@ defmodule Universa.SSLServer do
     :ok = SSL.ssl_accept(client)
 
     # Create a Terminal with default filters and shell
-    {:ok, pid} = DynamicSupervisor.start_child(TerminalSupervisor, 
-      {
-        Terminal, 
+    {:ok, pid} =
+      DynamicSupervisor.start_child(TerminalSupervisor, {
+        Terminal,
         [
-          socket: client, 
-          filters: [Universa.Filter.MCCP, Universa.Filter.Telnet, Universa.Filter.Ascii], 
+          socket: client,
+          filters: [Universa.Filter.MCCP, Universa.Filter.Telnet, Universa.Filter.Ascii],
           shell: Universa.Shell.Authentication,
           ssl: true
         ]
-      }
-    )
+      })
 
     # Hand ownership to the newly created Terminal, so it receives messages
     :ok = SSL.controlling_process(client, pid)
 
     # Full module name so it automatically uses a newer version if available
-    SSLServer.loop_accept socket
+    SSLServer.loop_accept(socket)
   end
 end

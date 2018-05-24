@@ -8,6 +8,7 @@ defmodule Universa.SystemAgent do
   end
 
   # Get all systems with a function for this event type
+  @spec systems(atom) :: list({number, atom})
   def systems(event) do
     Agent.get(__MODULE__, &Map.fetch(&1, event))
   end
@@ -33,10 +34,12 @@ defmodule Universa.SystemAgent do
       |> Enum.map(fn {priority, event} -> {event, priority, system} end)
     end)
     # Sort systems based on priority
-    |> Enum.sort(fn {_event1, priority1, _system1}, {_event2, priority2, _system2} -> priority1 >= priority2 end)
+    |> Enum.sort(fn {_event1, priority1, _system1}, {_event2, priority2, _system2} ->
+      priority1 >= priority2
+    end)
     # Remove any duplicates (because they are checking different events)
-    |> Enum.uniq
+    |> Enum.uniq()
     # Group systems under the same event
-    |> Enum.group_by(&Kernel.elem(&1, 0), &({elem(&1, 1), elem(&1, 2)}))
+    |> Enum.group_by(&Kernel.elem(&1, 0), &{elem(&1, 1), elem(&1, 2)})
   end
 end

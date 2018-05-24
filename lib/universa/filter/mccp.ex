@@ -1,6 +1,6 @@
 defmodule Universa.Filter.MCCP do
   alias Universa.Filter
-  
+
   use Filter
 
   def get(packet, _state), do: {packet, []}

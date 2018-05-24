@@ -1,6 +1,6 @@
 defmodule Universa.Filter do
-  @callback get(list, map) :: {list, map}
-  @callback put(list, map) :: {list, map}
+  @callback get(list, map) :: {map, list()}
+  @callback put(list, map) :: {map, list()}
 
   alias Universa.Filter
 

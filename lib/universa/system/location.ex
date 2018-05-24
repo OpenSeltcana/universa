@@ -10,16 +10,15 @@ defmodule Universa.System.Location do
 
   # If location is a string instead of a uuid, update it to a uuid
   event 50, :component, %Event{
-      target: entity,
-      data: %{
-        action: :create,
-        key: "location",
-        value: %{
-          "value" => location
-        }
+    target: entity,
+    data: %{
+      action: :create,
+      key: "location",
+      value: %{
+        "value" => location
       }
-    } do
-
+    }
+  } do
     if not is_uuid(location) do
       location_uuid = Location.get(location)
 
@@ -34,19 +33,18 @@ defmodule Universa.System.Location do
 
   # Do the same for component changes
   event 50, :component, %Event{
-      target: entity,
-      data: %{
-        action: :update,
-        key: "location",
-        old: %{
-          "value" => old_location
-        },
-        new: %{
-          "value" => new_location
-        }
+    target: entity,
+    data: %{
+      action: :update,
+      key: "location",
+      old: %{
+        "value" => old_location
+      },
+      new: %{
+        "value" => new_location
       }
-    } do
-
+    }
+  } do
     if is_uuid(old_location) do
       Channel.remove(old_location, entity)
     end

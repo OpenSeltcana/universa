@@ -54,6 +54,7 @@ defmodule Universa.Shell.Authentication do
         ]
 
         {events, %{state | step: :registration}}
+
       false ->
         events = [
           %Event{
@@ -71,7 +72,7 @@ defmodule Universa.Shell.Authentication do
               template: "telnet/will_echo.eex",
               to: terminal
             }
-          },
+          }
         ]
 
         {events, %{state | step: :password, username: String.capitalize("#{packet}")}}
@@ -79,7 +80,10 @@ defmodule Universa.Shell.Authentication do
   end
 
   # When we receive text and we are at the password step (second)
-  def input(packet, %{terminal: terminal, shell_state: %{step: :password, username: username} = state}) do
+  def input(packet, %{
+        terminal: terminal,
+        shell_state: %{step: :password, username: username} = state
+      }) do
     case Account.login(username, "#{packet}") do
       {:ok, uuid} ->
         events = [
@@ -110,6 +114,7 @@ defmodule Universa.Shell.Authentication do
         ]
 
         {events, %{state | step: :authenticated, uuid: uuid}}
+
       {:error, _} ->
         events = [
           %Event{
@@ -128,15 +133,15 @@ defmodule Universa.Shell.Authentication do
 
   # All incoming messsages from the game are templates that get filled in
   def output(
-      %Event{
-        type: :terminal,
-        data: %{
-          type: :output,
-          template: template
-        }
-      } = event, 
-      %{shell_state: state}
-    ) do
+        %Event{
+          type: :terminal,
+          data: %{
+            type: :output,
+            template: template
+          }
+        } = event,
+        %{shell_state: state}
+      ) do
     metadata = Map.get(event.data, :metadata, [])
     {:ok, msg} = Template.fill(template, metadata)
 
@@ -145,7 +150,7 @@ defmodule Universa.Shell.Authentication do
 
   # If we receive anthing other than template requests... Whine about it!
   def output(_, %{shell_state: state}) do
-    IO.write "We received spam, truly!?"
+    IO.write("We received spam, truly!?")
     {"", state}
   end
 

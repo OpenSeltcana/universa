@@ -9,8 +9,8 @@ defmodule UniversaTest do
 
   test "the database works as it should" do
     # assert we can insert and query an entity
-    {:ok, owner} = Entity.create
-    assert [owner.uuid] == Entity |> select([owner], owner.uuid) |> Repo.all
+    {:ok, owner} = Entity.create()
+    assert [owner.uuid] == Entity |> select([owner], owner.uuid) |> Repo.all()
 
     # assert we can insert component
     Component.create(owner, "list", %{value: "value1"})

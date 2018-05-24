@@ -16,11 +16,11 @@ defmodule Universa.System.Telnet.MSSP do
 
   # When telnet is started, notify we support MSSP!
   event 50, :telnet, %Event{
-      data: %{
-        type: :start, 
-        from: terminal
-      }
-    } do
+    data: %{
+      type: :start,
+      from: terminal
+    }
+  } do
     %Event{
       type: :terminal,
       data: %{
@@ -29,16 +29,16 @@ defmodule Universa.System.Telnet.MSSP do
         to: terminal
       }
     }
-    |> Event.emit
+    |> Event.emit()
   end
 
   # When MSSP request is received, send the message!
   event 50, :telnet, %Event{
-      data: %{
-        command: [255, 253, 70],
-        from: terminal
-      }
-    } do
+    data: %{
+      command: [255, 253, 70],
+      from: terminal
+    }
+  } do
     # Collect information
     {:ok, version} = Application.get_key(:universa, :vsn)
     # Send up to date information
@@ -56,10 +56,11 @@ defmodule Universa.System.Telnet.MSSP do
           "ANSI" => 1,
           "MCCP" => 1,
           "PLAYERS" => length(Channel.get("players")),
-          "UPTIME" => -1 # TODO: Figure out where to keep track of this
+          # TODO: Figure out where to keep track of this
+          "UPTIME" => -1
         }
       }
     }
-    |> Event.emit
+    |> Event.emit()
   end
 end

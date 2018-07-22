@@ -49,7 +49,7 @@ defmodule Universa.MixProject do
         Systems: ~r"Universa.System.",
         Components: ~r"Universa.Component.",
         Shells: ~r"Universa.Shell.",
-        Parsers: ~r"Universa.Parsers."
+        Parsers: ~r"Universa.Parser."
       ]
     ]
   end

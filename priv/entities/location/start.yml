@@ -1,0 +1,5 @@
+physical:
+  name: "Starters Location"
+
+location:
+  exits: [["up", "start2"]]

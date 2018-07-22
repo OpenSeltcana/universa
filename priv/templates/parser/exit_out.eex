@@ -1,0 +1,1 @@
+ <%= Universa.Component.Physical.take(data.from).name %> leaves going <%= data.exit %>.

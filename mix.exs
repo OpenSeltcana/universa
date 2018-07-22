@@ -28,7 +28,7 @@ defmodule Universa.MixProject do
       {:ex_doc, "~> 0.18.0", only: :dev, runtime: false, optional: true},
       {:dialyxir, "~> 1.0.0-rc.2", only: :dev, runtime: false, optional: true},
       {:elixir_uuid, "~> 1.2"},
-      {:ini, git: "https://github.com/nathanjohnson320/ini.git"}
+      {:yaml_elixir, "~> 2.1"},
     ]
   end
 

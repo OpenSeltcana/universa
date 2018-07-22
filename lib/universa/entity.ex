@@ -46,8 +46,8 @@ defmodule Universa.Entity do
   end
 
   def from_file(file) do
-    local_path = "priv/entities/#{file}.ini"
-    default_path = Path.join(:code.priv_dir(:universa), "entities/#{file}.ini")
+    local_path = "priv/entities/#{file}.yml"
+    default_path = Path.join(:code.priv_dir(:universa), "entities/#{file}.yml")
 
     cond do
       File.exists?(local_path) -> # Try local files first
@@ -61,13 +61,12 @@ defmodule Universa.Entity do
   end
 
   defp unsafe_from_file(path) do
-    {:ok, ini} = File.read(path)
-    template = Ini.decode(ini)
+    {:ok, template} = YamlElixir.read_from_file(path)
 
     entity = create()
     Enum.each(template, fn {component, properties} ->
-      module = String.to_existing_atom("Elixir.Universa.Component.#{String.capitalize(Atom.to_string(component))}")
-      module.create(entity, properties)
+      module = String.to_existing_atom("Elixir.Universa.Component.#{String.capitalize(component)}")
+      module.create(entity, Enum.map(properties, fn {key, value} -> {String.to_atom(key), value} end) |> Map.new)
     end)
 
     entity

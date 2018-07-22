@@ -1,4 +1,6 @@
-<%= t.fg.bgreen %><%= data.location.name %><%= t.fg.reset %>
-<%= data.location.description %>
+<%= t.fg.bgreen %><%= data.physical.name %><%= t.fg.reset %>
+<%= data.physical.description %>
+
+Obvious exits: <%= Enum.map(data.location.exits, fn [name, _uuid] -> name end) |> Enum.join(", ") %>.
 
 <%= data.contents %>

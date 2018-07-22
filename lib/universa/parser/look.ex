@@ -12,6 +12,7 @@ defmodule Universa.Parser.Look do
       nil -> %{name: "void", description: "The void is endless and consumes all."}
       physical -> physical
     end
+    location_location = Component.Location.take(location)
 
     contents =
       Channel.members(location)
@@ -31,7 +32,8 @@ defmodule Universa.Parser.Look do
           type: :output,
           template: "parser/look.eex",
           metadata: %{
-            location: location_physical,
+            location: location_location,
+            physical: location_physical,
             contents: contents
           }
         }

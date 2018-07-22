@@ -1,0 +1,5 @@
+physical:
+  name: "Starters Location - Continued"
+
+location:
+  exits: [["down", "start"]]

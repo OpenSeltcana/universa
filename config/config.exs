@@ -14,7 +14,6 @@ config :universa,
     [50, Universa.Parser.Help],
     [50, Universa.Parser.Say],
     [50, Universa.Parser.OOC],
-    [50, Universa.Parser.Look]
-  ],
-  # The name all new characters get
-  default_name: "New Person"
+    [50, Universa.Parser.Look],
+    [90, Universa.Parser.Exits]
+  ]

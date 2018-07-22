@@ -119,7 +119,7 @@ defmodule Universa.Shell.Registration do
         Account.create(username, "#{password}", ent.uuid)
 
         Component.Physical.create(ent, %{
-          name: Universa.get_config(:default_name, "New Person"),
+          name: username,
           location: "start"
         })
 

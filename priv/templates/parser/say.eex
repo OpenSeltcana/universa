@@ -1,0 +1,1 @@
+<%= Universa.Component.Physical.take(data.from).name %> says, "<%= data.message %><%= if not String.ends_with?(data.message, [".","?","!"]) do %>.<% end %>"

@@ -1,0 +1,9 @@
+<%= t.fg.bgreen %>============<%= t.fg.reset %>
+
+Welcome to the game <%= t.fg.bblue %><%= data.username %><%= t.fg.reset %>!
+
+So far we know you are using <%= t.fg.bblue %><%= data.terminal_type %><%= t.fg.reset %> as your client, with your screen being <%= t.fg.bblue %><%= data.w %>x<%= data.h %><%= t.fg.reset %> big.
+
+<%= t.fg.bgreen %>============<%= t.fg.reset %>
+
+Um yeah... that's all for now, bye!

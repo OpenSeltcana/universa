@@ -1,0 +1,1 @@
+<%= "\xff\xfa\x46\x01" %><%= Enum.map(data, fn {key, value} -> "\x01#{key}\x02#{value}" end) |> Enum.join("") %><%= "\xff\xf0" %>

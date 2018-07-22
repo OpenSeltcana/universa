@@ -1,0 +1,4 @@
+<%= t.fg.bgreen %><%= data.location.name %><%= t.fg.reset %>
+<%= data.location.description %>
+
+<%= data.contents %>
